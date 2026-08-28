@@ -61,27 +61,33 @@ export type Database = {
       }
       cart_items: {
         Row: {
+          addon_selection_key: string
           cart_id: string
           created_at: string
           id: string
           product_variant_id: string
           quantity: number
+          selected_addons: Json
           unit_price_cents: number
         }
         Insert: {
+          addon_selection_key?: string
           cart_id: string
           created_at?: string
           id?: string
           product_variant_id: string
           quantity?: number
+          selected_addons?: Json
           unit_price_cents: number
         }
         Update: {
+          addon_selection_key?: string
           cart_id?: string
           created_at?: string
           id?: string
           product_variant_id?: string
           quantity?: number
+          selected_addons?: Json
           unit_price_cents?: number
         }
         Relationships: [
@@ -168,6 +174,7 @@ export type Database = {
           product_name: string
           product_variant_id: string | null
           quantity: number
+          selected_addons: Json
           total_price_cents: number
           unit_price_cents: number
           variant_label: string
@@ -178,6 +185,7 @@ export type Database = {
           product_name: string
           product_variant_id?: string | null
           quantity: number
+          selected_addons?: Json
           total_price_cents: number
           unit_price_cents: number
           variant_label: string
@@ -188,6 +196,7 @@ export type Database = {
           product_name?: string
           product_variant_id?: string | null
           quantity?: number
+          selected_addons?: Json
           total_price_cents?: number
           unit_price_cents?: number
           variant_label?: string
@@ -262,6 +271,60 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      product_addons: {
+        Row: {
+          extra_production_days: number
+          help_text: string | null
+          id: string
+          is_active: boolean
+          kind: string
+          label: string
+          price_cents: number
+          pricing_mode: string
+          product_id: string
+          sort_order: number
+        }
+        Insert: {
+          extra_production_days?: number
+          help_text?: string | null
+          id?: string
+          is_active?: boolean
+          kind: string
+          label: string
+          price_cents: number
+          pricing_mode?: string
+          product_id: string
+          sort_order?: number
+        }
+        Update: {
+          extra_production_days?: number
+          help_text?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: string
+          label?: string
+          price_cents?: number
+          pricing_mode?: string
+          product_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_addons_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "product_starting_prices"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_addons_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_images: {
         Row: {

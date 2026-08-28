@@ -35,7 +35,7 @@ export default async function OrderDetailPage({
 
   const { data: items } = await supabase
     .from("order_items")
-    .select("id, product_name, variant_label, quantity, unit_price_cents, total_price_cents")
+    .select("id, product_name, variant_label, quantity, unit_price_cents, total_price_cents, selected_addons")
     .eq("order_id", id);
 
   const address = order.shipping_address as {
@@ -58,17 +58,27 @@ export default async function OrderDetailPage({
 
       <div className="mt-6 grid gap-8 lg:grid-cols-3">
         <div className="rounded-xl border border-slate-200 bg-white p-5 lg:col-span-2">
-          {items?.map((item) => (
-            <div key={item.id} className="flex justify-between border-b border-slate-100 py-3 last:border-0">
-              <div>
-                <p className="font-medium text-ink">{item.product_name}</p>
-                <p className="text-sm text-slate-500">
-                  {item.variant_label} × {item.quantity}
-                </p>
+          {items?.map((item) => {
+            const selectedAddons = (item.selected_addons ?? []) as unknown as {
+              label: string;
+            }[];
+            return (
+              <div key={item.id} className="flex justify-between border-b border-slate-100 py-3 last:border-0">
+                <div>
+                  <p className="font-medium text-ink">{item.product_name}</p>
+                  <p className="text-sm text-slate-500">
+                    {item.variant_label} × {item.quantity}
+                  </p>
+                  {selectedAddons.length > 0 && (
+                    <p className="text-xs text-slate-400">
+                      {selectedAddons.map((a) => a.label).join(", ")}
+                    </p>
+                  )}
+                </div>
+                <p className="font-semibold text-ink">{formatCents(item.total_price_cents)}</p>
               </div>
-              <p className="font-semibold text-ink">{formatCents(item.total_price_cents)}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="h-fit space-y-4 rounded-xl border border-slate-200 bg-white p-5">

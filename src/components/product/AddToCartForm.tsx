@@ -1,38 +1,90 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { formatCents } from "@/lib/format";
 import { addToCartAction } from "@/lib/cart/actions";
-import { cn } from "@/lib/cn";
+import {
+  computeAddonsTotalCents,
+  deriveAttributeOptions,
+  type AddonInfo,
+  type AttributeVariant,
+  type VariantAttributes,
+} from "@/lib/product/attributes";
+import { AttributeSelect } from "@/components/product/AttributeSelect";
+import { QuantityTierList } from "@/components/product/QuantityTierList";
+import { AddonChecklist } from "@/components/product/AddonChecklist";
 
-type Variant = {
-  id: string;
-  label: string;
-  quantity: number;
-  priceCents: number;
-  isDefault: boolean;
-};
-
-export function AddToCartForm({ variants }: { variants: Variant[] }) {
+export function AddToCartForm({
+  variants,
+  addons,
+}: {
+  variants: AttributeVariant[];
+  addons: AddonInfo[];
+}) {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState(
-    variants.find((v) => v.isDefault)?.id ?? variants[0]?.id,
+  const attributeOptions = useMemo(() => deriveAttributeOptions(variants), [variants]);
+
+  const initialVariant = variants.find((v) => v.isDefault) ?? variants[0];
+
+  const [selectedAttributes, setSelectedAttributes] = useState<VariantAttributes>(
+    initialVariant?.attributes ?? {},
   );
+  const [selectedVariantId, setSelectedVariantId] = useState<string | undefined>(initialVariant?.id);
+  const [selectedAddonIds, setSelectedAddonIds] = useState<Set<string>>(new Set());
   const [qty, setQty] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [added, setAdded] = useState(false);
 
-  const selected = variants.find((v) => v.id === selectedId) ?? variants[0];
+  const candidateVariants = useMemo(
+    () =>
+      variants.filter((v) =>
+        Object.entries(selectedAttributes).every(([key, value]) => v.attributes[key] === value),
+      ),
+    [variants, selectedAttributes],
+  );
+
+  const selected = candidateVariants.find((v) => v.id === selectedVariantId) ?? candidateVariants[0];
+
+  function handleAttributeChange(key: string, value: string) {
+    const nextAttributes = { ...selectedAttributes, [key]: value };
+    setSelectedAttributes(nextAttributes);
+
+    const nextCandidates = variants.filter((v) =>
+      Object.entries(nextAttributes).every(([k, val]) => v.attributes[k] === val),
+    );
+    const stillValid = nextCandidates.some((v) => v.id === selectedVariantId);
+    if (!stillValid) {
+      const cheapest = [...nextCandidates].sort((a, b) => a.quantity - b.quantity)[0];
+      setSelectedVariantId(cheapest?.id);
+    }
+  }
+
+  function toggleAddon(addonId: string) {
+    setSelectedAddonIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(addonId)) next.delete(addonId);
+      else next.add(addonId);
+      return next;
+    });
+  }
 
   if (!selected) {
     return <p className="text-sm text-slate-500">Produto indisponível no momento.</p>;
   }
 
+  const selectedAddonsInfo = addons.filter((a) => selectedAddonIds.has(a.id));
+  const addonsTotal = computeAddonsTotalCents(selectedAddonsInfo, qty);
+  const totalCents = selected.priceCents * qty + addonsTotal;
+
+  const addonList = addons.filter((a) => a.kind === "addon");
+  const serviceList = addons.filter((a) => a.kind === "service");
+
   function handleAdd() {
+    if (!selected) return;
     setAdded(false);
     startTransition(async () => {
-      await addToCartAction(selected.id, qty);
+      await addToCartAction(selected.id, qty, [...selectedAddonIds]);
       setAdded(true);
       router.refresh();
     });
@@ -40,29 +92,37 @@ export function AddToCartForm({ variants }: { variants: Variant[] }) {
 
   return (
     <div className="space-y-5">
-      <div>
-        <p className="text-sm font-medium text-ink">Quantidade</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {variants.map((variant) => (
-            <button
-              key={variant.id}
-              type="button"
-              onClick={() => setSelectedId(variant.id)}
-              className={cn(
-                "rounded-lg border px-3 py-2 text-sm transition",
-                variant.id === selectedId
-                  ? "border-brand bg-brand/5 text-brand-dark font-semibold"
-                  : "border-slate-200 text-slate-600 hover:border-slate-300",
-              )}
-            >
-              {variant.label}
-              <span className="block text-xs font-normal text-slate-400">
-                {formatCents(variant.priceCents)}
-              </span>
-            </button>
+      {attributeOptions.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {attributeOptions.map((option) => (
+            <AttributeSelect
+              key={option.key}
+              option={option}
+              value={selectedAttributes[option.key] ?? option.values[0]}
+              onChange={(value) => handleAttributeChange(option.key, value)}
+            />
           ))}
         </div>
-      </div>
+      )}
+
+      <QuantityTierList
+        variants={candidateVariants}
+        selectedId={selected.id}
+        onSelect={setSelectedVariantId}
+      />
+
+      <AddonChecklist
+        title="Acabamentos Opcionais"
+        addons={addonList}
+        selectedIds={selectedAddonIds}
+        onToggle={toggleAddon}
+      />
+      <AddonChecklist
+        title="Serviços Opcionais"
+        addons={serviceList}
+        selectedIds={selectedAddonIds}
+        onToggle={toggleAddon}
+      />
 
       <div className="flex items-end gap-4">
         <div>
@@ -86,11 +146,10 @@ export function AddToCartForm({ variants }: { variants: Variant[] }) {
               +
             </button>
           </div>
+          <p className="mt-1 text-xs text-slate-400">x {selected.label}</p>
         </div>
 
-        <p className="text-2xl font-bold text-ink">
-          {formatCents(selected.priceCents * qty)}
-        </p>
+        <p className="text-2xl font-bold text-ink">{formatCents(totalCents)}</p>
       </div>
 
       <button

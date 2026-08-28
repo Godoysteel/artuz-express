@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import type { AddonInfo, AttributeVariant } from "@/lib/product/attributes";
 
 export type CategoryCard = {
   id: string;
@@ -101,13 +102,8 @@ export type ProductDetail = {
   description: string | null;
   category: { slug: string; name: string };
   images: { url: string; alt: string | null }[];
-  variants: {
-    id: string;
-    label: string;
-    quantity: number;
-    priceCents: number;
-    isDefault: boolean;
-  }[];
+  variants: AttributeVariant[];
+  addons: AddonInfo[];
 };
 
 export async function getProductBySlug(slug: string): Promise<ProductDetail | null> {
@@ -118,7 +114,8 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
       `id, slug, name, description,
        categories ( slug, name ),
        product_images ( url, alt, sort_order ),
-       product_variants ( id, label, quantity, price_cents, is_default, is_active, sort_order )`,
+       product_variants ( id, label, quantity, price_cents, attributes, is_default, is_active, sort_order ),
+       product_addons ( id, kind, label, price_cents, pricing_mode, extra_production_days, help_text, is_active, sort_order )`,
     )
     .eq("slug", slug)
     .eq("is_active", true)
@@ -127,7 +124,7 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
   if (error || !data || !data.categories) return null;
 
   const images = [...(data.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
-  const variants = (data.product_variants ?? [])
+  const variants: AttributeVariant[] = (data.product_variants ?? [])
     .filter((v) => v.is_active)
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((v) => ({
@@ -136,6 +133,20 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
       quantity: v.quantity,
       priceCents: v.price_cents,
       isDefault: v.is_default,
+      attributes: (v.attributes ?? {}) as Record<string, string>,
+    }));
+
+  const addons: AddonInfo[] = (data.product_addons ?? [])
+    .filter((a) => a.is_active)
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((a) => ({
+      id: a.id,
+      kind: a.kind as "addon" | "service",
+      label: a.label,
+      priceCents: a.price_cents,
+      pricingMode: a.pricing_mode as "flat" | "per_unit",
+      extraProductionDays: a.extra_production_days,
+      helpText: a.help_text,
     }));
 
   return {
@@ -146,5 +157,6 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
     category: { slug: data.categories.slug, name: data.categories.name },
     images: images.map((i) => ({ url: i.url, alt: i.alt })),
     variants,
+    addons,
   };
 }

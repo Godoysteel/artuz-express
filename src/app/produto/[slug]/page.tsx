@@ -3,7 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
-import { getProductBySlug } from "@/lib/catalog";
+import { CategoryProductJump } from "@/components/product/CategoryProductJump";
+import {
+  getCategoriesWithStartingPrice,
+  getProductBySlug,
+  getProductsByCategorySlug,
+} from "@/lib/catalog";
 
 export default async function ProductPage({
   params,
@@ -14,11 +19,20 @@ export default async function ProductPage({
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
+  const [categories, siblingProducts] = await Promise.all([
+    getCategoriesWithStartingPrice(),
+    getProductsByCategorySlug(product.category.slug),
+  ]);
+
   const cover = product.images[0];
 
   return (
     <Container className="py-8">
       <nav className="text-sm text-slate-500">
+        <Link href="/" className="hover:text-brand">
+          Home
+        </Link>
+        <span className="mx-2">/</span>
         <Link href={`/categorias/${product.category.slug}`} className="hover:text-brand">
           {product.category.name}
         </Link>
@@ -46,8 +60,17 @@ export default async function ProductPage({
             <p className="mt-3 text-slate-600">{product.description}</p>
           )}
 
-          <div className="mt-8 border-t border-slate-200 pt-6">
-            <AddToCartForm variants={product.variants} />
+          <div className="mt-6 border-t border-slate-200 pt-6">
+            <CategoryProductJump
+              categories={categories}
+              products={siblingProducts}
+              currentCategorySlug={product.category.slug}
+              currentProductSlug={product.slug}
+            />
+          </div>
+
+          <div className="mt-6 border-t border-slate-200 pt-6">
+            <AddToCartForm variants={product.variants} addons={product.addons} />
           </div>
         </div>
       </div>

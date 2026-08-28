@@ -32,6 +32,11 @@ export function CartItemRow({ line }: { line: CartLine }) {
           {line.product.name}
         </Link>
         <p className="text-sm text-slate-500">{line.variant.label}</p>
+        {line.selectedAddons.length > 0 && (
+          <p className="text-xs text-slate-400">
+            {line.selectedAddons.map((a) => a.label).join(", ")}
+          </p>
+        )}
         <p className="mt-1 text-sm font-semibold text-brand-dark">{formatCents(line.unitPriceCents)}</p>
       </div>
 
@@ -58,7 +63,7 @@ export function CartItemRow({ line }: { line: CartLine }) {
       </div>
 
       <p className="w-24 shrink-0 text-right font-semibold text-ink">
-        {formatCents(line.unitPriceCents * line.quantity)}
+        {formatCents(line.lineTotalCents)}
       </p>
 
       <button

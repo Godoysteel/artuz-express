@@ -7,8 +7,12 @@ import {
   updateCartItemQuantity,
 } from "@/lib/cart/cart-service";
 
-export async function addToCartAction(variantId: string, quantity: number) {
-  await addItemToCart(variantId, quantity);
+export async function addToCartAction(
+  variantId: string,
+  quantity: number,
+  selectedAddonIds: string[] = [],
+) {
+  await addItemToCart(variantId, quantity, selectedAddonIds);
   revalidatePath("/carrinho");
 }
 

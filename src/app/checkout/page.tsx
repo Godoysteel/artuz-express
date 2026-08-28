@@ -25,7 +25,7 @@ export default async function CheckoutPage() {
                 <span className="truncate">
                   {line.quantity}× {line.product.name} ({line.variant.label})
                 </span>
-                <span className="shrink-0">{formatCents(line.unitPriceCents * line.quantity)}</span>
+                <span className="shrink-0">{formatCents(line.lineTotalCents)}</span>
               </li>
             ))}
           </ul>

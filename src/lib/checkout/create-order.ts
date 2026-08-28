@@ -2,6 +2,8 @@ import "server-only";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getPreferenceClient } from "@/lib/mercadopago/client";
 import { createClient as createServerClient } from "@/lib/supabase/server";
+import { computeAddonsTotalCents } from "@/lib/product/attributes";
+import type { SelectedAddonSnapshot } from "@/lib/cart/cart-service";
 
 export type CheckoutAddress = {
   cep: string;
@@ -34,7 +36,7 @@ export async function createOrderAndPreference(input: CheckoutInput) {
   const { data: items, error: itemsError } = await service
     .from("cart_items")
     .select(
-      `id, quantity,
+      `id, quantity, selected_addons,
        product_variants ( id, label, price_cents, products ( name ) )`,
     )
     .eq("cart_id", input.cartId);
@@ -47,6 +49,8 @@ export async function createOrderAndPreference(input: CheckoutInput) {
     const variant = item.product_variants;
     const product = variant?.products;
     if (!variant || !product) return [];
+    const selectedAddons = (item.selected_addons ?? []) as unknown as SelectedAddonSnapshot[];
+    const addonsTotalCents = computeAddonsTotalCents(selectedAddons, item.quantity);
     return [
       {
         productName: product.name,
@@ -54,6 +58,9 @@ export async function createOrderAndPreference(input: CheckoutInput) {
         variantId: variant.id,
         quantity: item.quantity,
         unitPriceCents: variant.price_cents,
+        selectedAddons,
+        addonsTotalCents,
+        totalPriceCents: item.quantity * variant.price_cents + addonsTotalCents,
       },
     ];
   });
@@ -62,10 +69,7 @@ export async function createOrderAndPreference(input: CheckoutInput) {
     throw new CheckoutError("Carrinho vazio ou inválido.");
   }
 
-  const subtotalCents = lineItems.reduce(
-    (sum, line) => sum + line.quantity * line.unitPriceCents,
-    0,
-  );
+  const subtotalCents = lineItems.reduce((sum, line) => sum + line.totalPriceCents, 0);
   const shippingCents = 0;
   const totalCents = subtotalCents + shippingCents;
 
@@ -100,7 +104,8 @@ export async function createOrderAndPreference(input: CheckoutInput) {
       variant_label: line.variantLabel,
       quantity: line.quantity,
       unit_price_cents: line.unitPriceCents,
-      total_price_cents: line.quantity * line.unitPriceCents,
+      total_price_cents: line.totalPriceCents,
+      selected_addons: line.selectedAddons,
     })),
   );
 
@@ -115,9 +120,15 @@ export async function createOrderAndPreference(input: CheckoutInput) {
     body: {
       items: lineItems.map((line) => ({
         id: line.variantId,
-        title: `${line.productName} — ${line.variantLabel}`,
-        quantity: line.quantity,
-        unit_price: line.unitPriceCents / 100,
+        title:
+          line.selectedAddons.length > 0
+            ? `${line.productName} — ${line.variantLabel} (+ ${line.selectedAddons.map((a) => a.label).join(", ")})`
+            : `${line.productName} — ${line.variantLabel}`,
+        // Adicionais têm regras de preço mistas (flat vs. por unidade), então cada
+        // linha do carrinho vira 1 item do Mercado Pago com o total já calculado,
+        // em vez de tentar manter preço-unitário × quantidade em sincronia.
+        quantity: 1,
+        unit_price: line.totalPriceCents / 100,
         currency_id: "BRL",
       })),
       payer: { email: input.email },
