@@ -7,6 +7,7 @@ import { addToCartAction } from "@/lib/cart/actions";
 import {
   computeAddonsTotalCents,
   deriveAttributeOptions,
+  pickConfigurableAttributes,
   type AddonInfo,
   type AttributeVariant,
   type VariantAttributes,
@@ -28,7 +29,7 @@ export function AddToCartForm({
   const initialVariant = variants.find((v) => v.isDefault) ?? variants[0];
 
   const [selectedAttributes, setSelectedAttributes] = useState<VariantAttributes>(
-    initialVariant?.attributes ?? {},
+    pickConfigurableAttributes(initialVariant?.attributes ?? {}),
   );
   const [selectedVariantId, setSelectedVariantId] = useState<string | undefined>(initialVariant?.id);
   const [selectedAddonIds, setSelectedAddonIds] = useState<Set<string>>(new Set());
