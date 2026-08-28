@@ -4,14 +4,14 @@
   --background: #f8fafc;
   --foreground: #0f172a;
 
-  /* Brand palette: derivada do tom azul-acinzentado da logo Artuz (#72849E) */
-  --brand: #72849e;
-  --brand-dark: #475467;
-  --brand-light: #aab5c5;
-  --accent: #376ebe;
-  --accent-dark: #2c5796;
-  --ink: #181d25;
-  --ink-soft: #212731;
+  /* Brand palette: derivada do tom azul-acinzentado da logo Artuz (#72849E), em versão mais clara */
+  --brand: #8696ac;
+  --brand-dark: #57687f;
+  --brand-light: #c3cad5;
+  --accent: #4d81cb;
+  --accent-dark: #356ab6;
+  --ink: #29313d;
+  --ink-soft: #394556;
   --paper: #f8fafc;
 }
 
