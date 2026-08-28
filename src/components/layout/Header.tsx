@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ShoppingCart, User } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SearchBar } from "@/components/layout/SearchBar";
@@ -17,11 +18,18 @@ export async function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-ink text-white">
       <Container className="flex h-16 items-center gap-6">
-        <Link href="/" className="flex shrink-0 items-center gap-1 text-xl font-bold tracking-tight">
-          <span className="bg-gradient-to-r from-brand-light to-accent bg-clip-text text-transparent">
-            Artuz
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <Image
+            src="/logo-artuz.png"
+            alt="Artuz"
+            width={126}
+            height={36}
+            className="h-8 w-auto sm:h-9"
+            priority
+          />
+          <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-brand-light to-accent bg-clip-text text-transparent">
+            Express
           </span>
-          <span className="text-white">Express</span>
         </Link>
 
         <div className="hidden flex-1 md:block">
