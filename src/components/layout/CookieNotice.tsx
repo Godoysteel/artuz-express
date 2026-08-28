@@ -47,7 +47,7 @@ export function CookieNotice() {
         <button
           type="button"
           onClick={handleDismiss}
-          className="shrink-0 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-ink transition hover:brightness-95"
+          className="shrink-0 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110"
         >
           Fechar e continuar
         </button>

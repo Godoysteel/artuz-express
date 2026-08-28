@@ -18,7 +18,7 @@ export async function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-ink text-white">
       <Container className="flex h-16 items-center gap-6">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
+        <Link href="/" className="flex shrink-0 items-end gap-2">
           <Image
             src="/logo-artuz.png"
             alt="Artuz"
@@ -27,7 +27,7 @@ export async function Header() {
             className="h-8 w-auto sm:h-9"
             priority
           />
-          <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-brand-light to-accent bg-clip-text text-transparent">
+          <span className="pb-0.5 text-xl font-bold tracking-tight bg-gradient-to-r from-brand-light to-accent bg-clip-text text-transparent">
             Express
           </span>
         </Link>
@@ -51,7 +51,7 @@ export async function Header() {
             <ShoppingCart className="size-5" />
             <span className="hidden sm:inline">Carrinho</span>
             {itemCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-ink">
+              <span className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-white">
                 {itemCount}
               </span>
             )}

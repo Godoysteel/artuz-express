@@ -7,9 +7,9 @@ export function Footer() {
     <footer className="mt-16 border-t border-slate-800 bg-ink text-slate-300">
       <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-end gap-2">
             <Image src="/logo-artuz.png" alt="Artuz" width={126} height={36} className="h-8 w-auto" />
-            <span className="text-lg font-bold bg-gradient-to-r from-brand-light to-accent bg-clip-text text-transparent">
+            <span className="pb-0.5 text-lg font-bold bg-gradient-to-r from-brand-light to-accent bg-clip-text text-transparent">
               Express
             </span>
           </div>

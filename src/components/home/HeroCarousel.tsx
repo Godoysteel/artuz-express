@@ -58,10 +58,10 @@ export function HeroCarousel() {
             <div key={slide.title} className="min-w-0 flex-[0_0_100%] px-6 py-14 sm:px-12 sm:py-20">
               <div className="max-w-xl">
                 <h1 className="text-3xl font-bold text-white sm:text-4xl">{slide.title}</h1>
-                <p className="mt-3 text-base text-indigo-100 sm:text-lg">{slide.subtitle}</p>
+                <p className="mt-3 text-base text-slate-200 sm:text-lg">{slide.subtitle}</p>
                 <Link
                   href={slide.href}
-                  className="mt-6 inline-flex items-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-95"
+                  className="mt-6 inline-flex items-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
                 >
                   {slide.cta}
                 </Link>
