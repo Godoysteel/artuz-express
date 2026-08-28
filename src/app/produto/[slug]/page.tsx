@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PackageOpen } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
@@ -42,15 +43,19 @@ export default async function ProductPage({
 
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-100">
-          {cover && (
+          {cover ? (
             <Image
               src={cover.url}
               alt={cover.alt ?? product.name}
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
-              priority
+              preload
             />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-50 text-brand/40">
+              <PackageOpen className="h-24 w-24" />
+            </div>
           )}
         </div>
 

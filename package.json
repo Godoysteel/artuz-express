@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "catalog:download": "node scripts/download-atualcard-prices.mjs",
+    "catalog:build": "pwsh -NoProfile -File scripts/build-atualcard-catalog.ps1",
+    "catalog:sync": "node --env-file=.env.local scripts/sync-atualcard-catalog.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

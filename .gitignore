@@ -19,6 +19,8 @@
 
 # production
 /build
+/tmp/
+/data/supplier/
 
 # misc
 .DS_Store
