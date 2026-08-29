@@ -61,6 +61,41 @@ const exactProductImages = {
   "copo-personalizado-500ml": "familia-copo-personalizado-500ml.png",
 };
 
+const adhesiveImageRules = [
+  [/cartao de credito/, "familia-adesivo-cartao-credito.png"],
+  [/cartela de adesivo/, "familia-cartela-adesivos.png"],
+  [/casca de ovo/, "familia-adesivo-casca-ovo.png"],
+  [/(cd|dvd)/, "familia-adesivo-cd-dvd.png"],
+  [/dtf|termocolante/, "familia-adesivo-dtf-recorte.png"],
+  [/troca de oleo/, "familia-adesivo-troca-oleo.png"],
+  [/eletrostatico/, "familia-adesivo-eletrostatico.png"],
+  [/fecha sacola/, "familia-adesivo-fecha-sacola.png"],
+  [/lacre de seguranca/, "familia-lacre-seguranca.png"],
+  [/para-?choque|parachoque/, "familia-adesivo-parachoque.png"],
+  [/perfurado/, "familia-adesivo-perfurado.png"],
+  [/quadrado|retangular/, "familia-adesivo-quadrado-retangular.png"],
+  [/redondo/, "familia-adesivo-redondo.png"],
+  [/resinado/, "familia-adesivo-resinado.png"],
+  [/rotulo/, "familia-rotulos-adesivos.png"],
+  [/transparente/, "familia-adesivo-vinil-transparente.png"],
+  [/vitrine/, "familia-adesivo-vitrine.png"],
+  [/etiquetas escolares/, "familia-kit-etiquetas-escolares.png"],
+  [/papel/, "familia-adesivo-papel.png"],
+  [/vinil|personalizado por m|por m2/, "familia-adesivo-vinil.png"],
+];
+
+function normalize(value) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function resolveAdhesiveImage(product) {
+  const searchable = normalize(`${product.name} ${product.slug ?? ""}`);
+  return adhesiveImageRules.find(([pattern]) => pattern.test(searchable))?.[1];
+}
+
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
@@ -81,7 +116,7 @@ const products = [];
 for (let offset = 0; ; offset += 1000) {
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, category_id")
+    .select("id, name, slug, category_id")
     .in("category_id", [...categoryById.keys()])
     .range(offset, offset + 999);
 
@@ -105,9 +140,13 @@ for (let index = 0; index < productIds.length; index += 200) {
 
 const rows = products.map((product) => {
   const categorySlug = categoryById.get(product.category_id);
+  const image =
+    categorySlug === "adesivos"
+      ? resolveAdhesiveImage(product) ?? familyImages[categorySlug]
+      : familyImages[categorySlug];
   return {
     product_id: product.id,
-    url: `/produtos/catalogo-atualcard/${familyImages[categorySlug]}`,
+    url: `/produtos/catalogo-atualcard/${image}`,
     alt: product.name,
     sort_order: 0,
   };
