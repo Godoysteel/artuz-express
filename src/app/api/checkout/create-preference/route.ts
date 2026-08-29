@@ -15,6 +15,7 @@ const bodySchema = z.object({
     cidade: z.string().min(2),
     uf: z.string().length(2),
   }),
+  shippingServiceId: z.number(),
 });
 
 export async function POST(request: Request) {
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
       email: parsed.data.email,
       phone: parsed.data.phone,
       address: parsed.data.address,
+      shippingServiceId: parsed.data.shippingServiceId,
     });
     return NextResponse.json(result);
   } catch (error) {

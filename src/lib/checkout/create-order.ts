@@ -5,6 +5,7 @@ import { createClient as createServerClient } from "@/lib/supabase/server";
 import { computeAddonsTotalCents } from "@/lib/product/attributes";
 import type { SelectedAddonSnapshot } from "@/lib/cart/cart-service";
 import { DESIGN_SERVICE_LABEL } from "@/lib/product/design-service";
+import { getShippingOptionsForCart } from "@/lib/melhor-envio/quote";
 
 export type CheckoutAddress = {
   cep: string;
@@ -21,6 +22,7 @@ export type CheckoutInput = {
   email: string;
   phone: string;
   address: CheckoutAddress;
+  shippingServiceId: number;
 };
 
 export class CheckoutError extends Error {}
@@ -84,7 +86,15 @@ export async function createOrderAndPreference(input: CheckoutInput) {
   }
 
   const subtotalCents = lineItems.reduce((sum, line) => sum + line.totalPriceCents, 0);
-  const shippingCents = 0;
+
+  // Nunca confia no preço de frete vindo do client — recota no servidor com
+  // os mesmos itens/CEP e usa o preço da opção escolhida (por serviceId).
+  const shippingOptions = await getShippingOptionsForCart(input.cartId, input.address.cep);
+  const chosenShipping = shippingOptions.find((o) => o.serviceId === input.shippingServiceId);
+  if (!chosenShipping) {
+    throw new CheckoutError("Opção de frete inválida ou expirada. Recalcule o frete e tente novamente.");
+  }
+  const shippingCents = chosenShipping.priceCents;
   const totalCents = subtotalCents + shippingCents;
 
   const authClient = await createServerClient();
@@ -160,19 +170,28 @@ export async function createOrderAndPreference(input: CheckoutInput) {
   const preferenceClient = getPreferenceClient();
   const preference = await preferenceClient.create({
     body: {
-      items: lineItems.map((line) => ({
-        id: line.variantId,
-        title:
-          line.selectedAddons.length > 0
-            ? `${line.productName} — ${line.variantLabel} (+ ${line.selectedAddons.map((a) => a.label).join(", ")})`
-            : `${line.productName} — ${line.variantLabel}`,
-        // Adicionais têm regras de preço mistas (flat vs. por unidade), então cada
-        // linha do carrinho vira 1 item do Mercado Pago com o total já calculado,
-        // em vez de tentar manter preço-unitário × quantidade em sincronia.
-        quantity: 1,
-        unit_price: line.totalPriceCents / 100,
-        currency_id: "BRL",
-      })),
+      items: [
+        ...lineItems.map((line) => ({
+          id: line.variantId,
+          title:
+            line.selectedAddons.length > 0
+              ? `${line.productName} — ${line.variantLabel} (+ ${line.selectedAddons.map((a) => a.label).join(", ")})`
+              : `${line.productName} — ${line.variantLabel}`,
+          // Adicionais têm regras de preço mistas (flat vs. por unidade), então cada
+          // linha do carrinho vira 1 item do Mercado Pago com o total já calculado,
+          // em vez de tentar manter preço-unitário × quantidade em sincronia.
+          quantity: 1,
+          unit_price: line.totalPriceCents / 100,
+          currency_id: "BRL",
+        })),
+        {
+          id: "frete",
+          title: `Frete — ${chosenShipping.serviceName} (${chosenShipping.companyName})`,
+          quantity: 1,
+          unit_price: shippingCents / 100,
+          currency_id: "BRL",
+        },
+      ],
       payer: { email: input.email },
       external_reference: order.id,
       back_urls: {

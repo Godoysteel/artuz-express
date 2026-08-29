@@ -4,13 +4,21 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutFormSchema, type CheckoutFormValues } from "@/lib/checkout/schema";
-import { maskCep } from "@/lib/format";
+import { maskCep, formatCents } from "@/lib/format";
 import { cn } from "@/lib/cn";
+
+type ShippingOption = {
+  serviceId: number;
+  serviceName: string;
+  companyName: string;
+  priceCents: number;
+  deliveryDays: number | null;
+};
 
 const inputClass =
   "w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-ink placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20";
 
-export function CheckoutForm() {
+export function CheckoutForm({ subtotalCents }: { subtotalCents: number }) {
   const {
     register,
     handleSubmit,
@@ -21,6 +29,35 @@ export function CheckoutForm() {
 
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isLookingUpCep, setIsLookingUpCep] = useState(false);
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[] | null>(null);
+  const [selectedShippingId, setSelectedShippingId] = useState<number | null>(null);
+  const [isLoadingShipping, setIsLoadingShipping] = useState(false);
+  const [shippingError, setShippingError] = useState<string | null>(null);
+
+  async function fetchShippingOptions(digits: string) {
+    setIsLoadingShipping(true);
+    setShippingError(null);
+    setShippingOptions(null);
+    setSelectedShippingId(null);
+    try {
+      const response = await fetch("/api/checkout/shipping-quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cep: digits }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.options?.length) {
+        setShippingError(data.error ?? "Não foi possível calcular o frete pra esse CEP.");
+        return;
+      }
+      setShippingOptions(data.options);
+      setSelectedShippingId(data.options[0].serviceId);
+    } catch {
+      setShippingError("Não foi possível calcular o frete agora. Tente novamente.");
+    } finally {
+      setIsLoadingShipping(false);
+    }
+  }
 
   async function handleCepBlur(event: React.FocusEvent<HTMLInputElement>) {
     const digits = event.target.value.replace(/\D/g, "");
@@ -42,10 +79,15 @@ export function CheckoutForm() {
     } finally {
       setIsLookingUpCep(false);
     }
+    fetchShippingOptions(digits);
   }
 
   async function onSubmit(values: CheckoutFormValues) {
     setSubmitError(null);
+    if (!selectedShippingId) {
+      setSubmitError("Selecione uma opção de frete antes de continuar.");
+      return;
+    }
     try {
       const response = await fetch("/api/checkout/create-preference", {
         method: "POST",
@@ -62,6 +104,7 @@ export function CheckoutForm() {
             cidade: values.cidade,
             uf: values.uf,
           },
+          shippingServiceId: selectedShippingId,
         }),
       });
 
@@ -136,13 +179,65 @@ export function CheckoutForm() {
         </div>
       </div>
 
+      <div>
+        <h2 className="text-sm font-semibold text-ink">Frete</h2>
+        {isLoadingShipping && <p className="mt-2 text-xs text-slate-400">Calculando frete...</p>}
+        {shippingError && <p className="mt-2 text-xs text-red-500">{shippingError}</p>}
+        {!isLoadingShipping && !shippingError && !shippingOptions && (
+          <p className="mt-2 text-xs text-slate-400">Preencha o CEP acima para calcular o frete.</p>
+        )}
+        {shippingOptions && (
+          <div className="mt-3 space-y-2">
+            {shippingOptions.map((option) => (
+              <label
+                key={option.serviceId}
+                className={cn(
+                  "flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-sm",
+                  selectedShippingId === option.serviceId
+                    ? "border-brand bg-brand/5"
+                    : "border-slate-200",
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="shipping-option"
+                    checked={selectedShippingId === option.serviceId}
+                    onChange={() => setSelectedShippingId(option.serviceId)}
+                  />
+                  <span>
+                    {option.companyName} — {option.serviceName}
+                    {option.deliveryDays != null && (
+                      <span className="text-slate-400"> ({option.deliveryDays} dias úteis)</span>
+                    )}
+                  </span>
+                </span>
+                <span className="shrink-0 font-semibold text-ink">{formatCents(option.priceCents)}</span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selectedShippingId && shippingOptions && (
+        <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold text-ink">
+          <span>Total com frete</span>
+          <span>
+            {formatCents(
+              subtotalCents +
+                (shippingOptions.find((o) => o.serviceId === selectedShippingId)?.priceCents ?? 0),
+            )}
+          </span>
+        </div>
+      )}
+
       {submitError && (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{submitError}</p>
       )}
 
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || !selectedShippingId}
         className={cn(
           "w-full rounded-full bg-gradient-to-r from-brand to-accent-dark px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105 disabled:opacity-60",
         )}

@@ -114,7 +114,11 @@ Testado ponta a ponta em 2026-08-29 (produção): pedido criado → preferência
 - **Peso**: resolvido em 2026-08-29, ver seção "Peso das variantes" acima — usa `product_variants.weight_grams`.
 - **Dimensão da caixa**: nenhum produto tem isso cadastrado (fornecedor só informa peso). `src/lib/melhor-envio/box-tiers.ts` mapeia `category_slug` → caixa-padrão (pequena/média/grande/tubo), aprovado pelo cliente em 2026-08-29 como aproximação aceitável — frete fica uma estimativa, não exato. Categoria sem mapeamento explícito cai no `DEFAULT_BOX` (caixa média).
 
-CEP de origem fixo em `ORIGIN_POSTAL_CODE` (89205-800) — mesmo padrão de constante fixa usado em `src/lib/whatsapp.ts`, não é variável de ambiente. Ainda não ligado no checkout (`shipping_cents` continua fixo em 0 em `create-order.ts`) — falta a UI de cotação no `CheckoutForm`/`checkout/page.tsx` e a revalidação server-side do valor escolhido.
+CEP de origem fixo em `ORIGIN_POSTAL_CODE` (89205-800) — mesmo padrão de constante fixa usado em `src/lib/whatsapp.ts`, não é variável de ambiente.
+
+Ligado no checkout: `CheckoutForm.tsx` chama `POST /api/checkout/shipping-quote` no blur do CEP (`src/lib/melhor-envio/quote.ts` monta os itens a partir do carrinho ativo) e mostra as opções (PAC/SEDEX/...) num radio, com o total atualizado ao vivo. No submit, `create-order.ts` **recota o frete no servidor** com o mesmo carrinho/CEP e usa o preço da opção cujo `serviceId` bate com o escolhido pelo cliente — nunca confia no preço vindo do client (mesma postura do resto do checkout). Se a opção não existir mais na recotação (frete mudou entre o cliente ver e finalizar), rejeita com `CheckoutError` pedindo pra recalcular. O frete vira mais um item na preferência do Mercado Pago (`title: "Frete — <serviço> (<transportadora>)"`).
+
+Testado ponta a ponta em 2026-08-29 (dev local, contra a API real de produção do Melhor Envio): CEP 01310-200 → PAC R$22,08 (6 dias), SEDEX R$34,62 (2 dias); pedido criado com `shipping_cents`/`total_cents` corretos e preferência do Mercado Pago gerada normalmente (pedido de teste apagado depois).
 
 ## Painel de admin (`/admin/pedidos`)
 

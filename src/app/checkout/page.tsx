@@ -14,7 +14,7 @@ export default async function CheckoutPage() {
 
       <div className="mt-6 grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <CheckoutForm />
+          <CheckoutForm subtotalCents={subtotalCents} />
         </div>
 
         <div className="h-fit rounded-xl border border-slate-200 bg-white p-6">
