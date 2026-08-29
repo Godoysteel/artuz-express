@@ -53,6 +53,22 @@ npm run catalog:sync       # sincroniza esse catálogo com o banco Supabase (cat
 
 Os arquivos baixados/gerados (`data/`, `tmp/`) não são versionados — só os scripts. Produtos importados do fornecedor geralmente não têm foto ainda; o site mostra um ícone de placeholder até a imagem real ser adicionada em `product_images`.
 
+### Pós-processamento do catálogo importado
+
+Depois de um `catalog:sync`, dois problemas recorrentes precisam ser corrigidos manualmente (ou re-rodando os scripts abaixo):
+
+- **Produtos duplicados por tamanho** — o fornecedor cadastra cada tamanho como um produto separado (ex: "Adesivo em Vinil Transparente 13x19", "32x45", "40x40mm" ...). `scripts/merge-product-families.mjs` funde esses duplicados em um produto só, movendo o tamanho para `product_variants.attributes.tamanho` (vira dropdown no configurador em vez de card repetido na grade). Rodar sempre com `--dry-run --report=<arquivo>` primeiro para conferir o que seria mesclado:
+  ```bash
+  node --env-file=.env.local scripts/merge-product-families.mjs --dry-run --report=tmp/merge-report.json
+  node --env-file=.env.local scripts/merge-product-families.mjs
+  ```
+  O regex de tamanho (`SIZE_RE`/`AREA_RE` no topo do arquivo) só reconhece alguns formatos (`NxN`, `NxNcm`, `NxNmm`, `por cm2`/`m2`). Se aparecer um novo formato de tamanho no fim do nome do produto e ele não for detectado, é preciso estender esse regex — **não** existe uma correção genérica automática. Produtos "por cm²" (preço por peso/área, sem lista de tamanho fixo) são um caso à parte e não devem ser fundidos com a versão de tamanho fixo do mesmo produto.
+  ⚠️ Se rodar isso depois que uma família já tiver sido mesclada antes com um formato de tamanho diferente (ex: "3x3cm" numa mesclagem antiga e "13x19" numa nova), pode nascer um produto duplicado com o mesmo nome — confira sempre com a query abaixo depois de rodar:
+  ```sql
+  select category_id, name, count(*) from products group by category_id, name having count(*) > 1;
+  ```
+- **Imagens por família/subfamília** — `scripts/sync-atualcard-family-images.mjs` (todas as categorias) e `scripts/sync-atualcard-business-card-images.mjs` (só Cartões de Visita) mapeiam produto → imagem por palavra-chave no nome. Ao adicionar imagens novas em `public/produtos/catalogo-atualcard/`, atualizar o mapa de regras no script correspondente antes de rodar.
+
 ## Configurador de produto
 
 - `src/lib/product/attributes.ts` — lógica compartilhada (client + server): deriva quais atributos viram dropdown (só os que têm mais de um valor distinto no produto), casa a combinação selecionada com a variante certa, calcula o total de adicionais.
