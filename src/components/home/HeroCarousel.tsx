@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
@@ -11,18 +12,21 @@ const SLIDES = [
     subtitle: "Papel couché 300g com verniz total. Entrega rápida.",
     href: "/categorias/cartoes-de-visita",
     cta: "Peça o seu",
+    image: "/produtos/catalogo-atualcard/familia-cartoes-de-visita.png",
   },
   {
     title: "Material de campanha para 2026",
     subtitle: "Santinhos, adesivos e banners para sua campanha eleitoral.",
     href: "/categorias/eleicoes-2026",
     cta: "Ver eleições 2026",
+    image: "/produtos/santinho-eleitoral-4x0.png",
   },
   {
     title: "Banners e lonas de alta resistência",
     subtitle: "Acabamento em bastão e ilhós, prontos para instalar.",
     href: "/categorias/banners-e-lonas",
     cta: "Ver banners",
+    image: "/produtos/catalogo-atualcard/familia-banners-e-lonas.png",
   },
 ];
 
@@ -54,9 +58,21 @@ export function HeroCarousel() {
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand via-brand-dark to-ink">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {SLIDES.map((slide) => (
-            <div key={slide.title} className="min-w-0 flex-[0_0_100%] px-6 py-14 sm:px-12 sm:py-20">
-              <div className="max-w-xl">
+          {SLIDES.map((slide, index) => (
+            <div
+              key={slide.title}
+              className="relative min-w-0 flex-[0_0_100%] overflow-hidden px-6 py-14 sm:px-12 sm:py-20"
+            >
+              <Image
+                src={slide.image}
+                alt=""
+                fill
+                sizes="100vw"
+                priority={index === 0}
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/70 to-ink/30" />
+              <div className="relative max-w-xl">
                 <h1 className="text-3xl font-bold text-white sm:text-4xl">{slide.title}</h1>
                 <p className="mt-3 text-base text-slate-200 sm:text-lg">{slide.subtitle}</p>
                 <Link
