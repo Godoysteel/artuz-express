@@ -12,6 +12,10 @@ if (!supabaseUrl || !serviceRoleKey) {
 }
 
 const catalog = JSON.parse(await readFile(catalogPath, "utf8"));
+const excludedCategorySlugs = new Set(["entrega-12-horas"]);
+catalog.products = catalog.products.filter(
+  (product) => !excludedCategorySlugs.has(product.category_slug),
+);
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });

@@ -19,7 +19,7 @@ const SLIDES = [
     subtitle: "Santinhos, adesivos e banners para sua campanha eleitoral.",
     href: "/categorias/eleicoes-2026",
     cta: "Ver eleições 2026",
-    image: "/produtos/santinho-eleitoral-4x0.png",
+    image: "/produtos/catalogo-atualcard/familia-santinho-eleitoral-9x5.png",
   },
   {
     title: "Banners e lonas de alta resistência",

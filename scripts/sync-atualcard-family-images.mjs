@@ -32,7 +32,6 @@ const familyImages = {
   displays: "familia-displays.png",
   "embalagens-e-sacolas": "familia-embalagens-sacolas.png",
   envelopes: "familia-envelopes.png",
-  "entrega-12-horas": "familia-entrega-12-horas.png",
   "folder-flyer-e-panfleto": "familia-folder-flyer-panfleto.png",
   "grandes-formatos": "familia-grandes-formatos.png",
   imas: "familia-imas.png",
@@ -50,6 +49,16 @@ const familyImages = {
   "quadros-e-decoracoes": "familia-quadros-decoracoes.png",
   "tags-e-cartelas": "familia-tags-cartelas.png",
   "wind-banners": "familia-wind-banners.png",
+};
+
+const exactProductImages = {
+  "adesivo-dtf-recorte": "familia-adesivo-dtf-recorte.png",
+  "santinho-eleitoral-4x0": "familia-santinho-eleitoral-9x5.png",
+  "chaveiro-gravacao-laser": "familia-chaveiro-gravacao-laser.png",
+  "caneca-impressao-uv": "familia-caneca-impressao-uv.png",
+  "garrafa-impressao-dtf": "familia-garrafa-impressao-dtf.png",
+  "bandeira-impressao-tecido": "familia-bandeira-tecido.png",
+  "copo-personalizado-500ml": "familia-copo-personalizado-500ml.png",
 };
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -112,6 +121,37 @@ for (let index = 0; index < rows.length; index += 300) {
   if (error) throw error;
 }
 
+const { data: exactProducts, error: exactProductError } = await supabase
+  .from("products")
+  .select("id, slug, name")
+  .in("slug", Object.keys(exactProductImages));
+
+if (exactProductError) throw exactProductError;
+
+const exactProductIds = exactProducts.map((product) => product.id);
+if (exactProductIds.length > 0) {
+  const { error: exactDeleteError } = await supabase
+    .from("product_images")
+    .delete()
+    .in("product_id", exactProductIds)
+    .eq("sort_order", 0);
+
+  if (exactDeleteError) throw exactDeleteError;
+
+  const { error: exactInsertError } = await supabase
+    .from("product_images")
+    .insert(
+      exactProducts.map((product) => ({
+        product_id: product.id,
+        url: `/produtos/catalogo-atualcard/${exactProductImages[product.slug]}`,
+        alt: product.name,
+        sort_order: 0,
+      })),
+    );
+
+  if (exactInsertError) throw exactInsertError;
+}
+
 console.log(
-  `${rows.length} produtos associados a ${categories.length} imagens de família.`,
+  `${rows.length} produtos associados a ${categories.length} imagens de família e ${exactProducts.length} produtos receberam imagem específica.`,
 );
