@@ -87,6 +87,10 @@ Depois de um `catalog:sync`, dois problemas recorrentes precisam ser corrigidos 
 - **SKUs reduzidos por decisão do cliente** — a categoria Adesivos tinha 36 produtos "Adesivo para Vitrine Transparente ..." e 38 "Adesivo para Vitrine Vinil ..." (um por tema/tamanho fixo: Natal, Dia das Mães, Dia dos Pais, Volta às Aulas, Copa 2026, formatos, etc.), todos com 1 variante só. A pedido do cliente, mantivemos só o genérico de cada um (precificado por m²): "Adesivo Transparente" (slug `adesivo-para-vitrine-transparente-por-m-bf4c6630`) e "Adesivo para Vitrine Vinil" (slug `adesivo-para-vitrine-vinil-por-m-45f10527`) — os outros 35 + 37 foram apagados. **Um novo `catalog:sync` recriaria esses SKUs a partir da planilha do fornecedor** — se isso acontecer, apagar de novo em vez de manter. (Não confundir com "Adesivo em Vinil"/"Adesivo Eleitoral para Vitrine Vinil", produtos diferentes que não foram tocados.)
 - **Imagens por família/subfamília** — `scripts/sync-atualcard-family-images.mjs` (todas as categorias) e `scripts/sync-atualcard-business-card-images.mjs` (só Cartões de Visita) mapeiam produto → imagem por palavra-chave no nome. Ao adicionar imagens novas em `public/produtos/catalogo-atualcard/`, atualizar o mapa de regras no script correspondente antes de rodar.
 
+### Peso das variantes (`product_variants.weight_grams`)
+
+A planilha de preços do fornecedor já vem com peso por variante (`attributes.weight_kg`, gravado desde sempre pelo `catalog:sync` mas nunca usado). Em 2026-08-29, adicionada a coluna `product_variants.weight_grams` (migration `add_weight_grams_to_product_variants`) e populada com `round(weight_kg * 1000)` pra tudo que já tinha o dado: 24.384 de 24.427 variantes (99,8%). As 43 que ficaram sem peso são produtos cadastrados manualmente sem origem no fornecedor (seeds/exemplos como "Cartão Fidelidade com Arte Única", "Copo Personalizado" etc.) — não têm `attributes.specification` nem `weight_kg`. Um novo `catalog:sync` grava `attributes.weight_kg` de novo nas variantes que ele recria; se isso acontecer, precisa rodar de novo o mesmo `update ... where attributes ? 'weight_kg'` pra preencher `weight_grams` nas novas linhas. Existe pra viabilizar cálculo de frete real (Melhor Envio) — ainda não está ligado no checkout.
+
 ## Configurador de produto
 
 - `src/lib/product/attributes.ts` — lógica compartilhada (client + server): deriva quais atributos viram dropdown (só os que têm mais de um valor distinto no produto), casa a combinação selecionada com a variante certa, calcula o total de adicionais.
@@ -100,6 +104,17 @@ Checkout Pro (redirecionamento): `src/lib/checkout/create-order.ts` recalcula tu
 `NEXT_PUBLIC_SITE_URL` **precisa** ser uma URL pública em HTTPS (ex: `https://artuzexpress.com.br`) — o Mercado Pago rejeita a criação da preferência (`invalid_auto_return`) se `back_urls.success` apontar pra `localhost`. Configurado na Vercel (produção) em 2026-08-29; localmente o `.env.local` também aponta pro domínio real (não `localhost:3000`) pelo mesmo motivo — o retorno automático depois do pagamento só funciona voltando pro domínio de verdade de qualquer forma.
 
 Testado ponta a ponta em 2026-08-29 (produção): pedido criado → preferência criada → redirecionou pra tela real de pagamento do Mercado Pago com o item/valor corretos. Cliente completou um pagamento real (pedido AE-000005, R$12,00) e o webhook atualizou o status pra "paid" automaticamente — confirma que o fluxo inteiro funciona.
+
+## Frete (Melhor Envio)
+
+`src/lib/melhor-envio/client.ts` — integração OAuth2 (app "Artuz Express" cadastrado em `app.melhorenvio.com.br/integracoes/area-dev`, client_id/secret em `MELHOR_ENVIO_CLIENT_ID`/`MELHOR_ENVIO_CLIENT_SECRET`). Autorização é manual e única: acessar `/api/integrations/melhor-envio/authorize` logado como admin, aprovar na tela do Melhor Envio — o callback (`/api/integrations/melhor-envio/callback`) troca o `code` por `access_token`/`refresh_token` e grava na tabela `melhor_envio_tokens` (linha única, `id boolean primary key`). `getValidAccessToken()` renova sozinho via refresh_token quando falta menos de 1 dia pra expirar (access_token dura 30 dias, refresh_token 45).
+
+`calculateShipping(cep, itens)` cota frete somando todos os itens numa única caixa (aproximação: superestima peso/dimensão total em vez de arriscar subestimar). Dois dados que faltam no catálogo:
+
+- **Peso**: resolvido em 2026-08-29, ver seção "Peso das variantes" acima — usa `product_variants.weight_grams`.
+- **Dimensão da caixa**: nenhum produto tem isso cadastrado (fornecedor só informa peso). `src/lib/melhor-envio/box-tiers.ts` mapeia `category_slug` → caixa-padrão (pequena/média/grande/tubo), aprovado pelo cliente em 2026-08-29 como aproximação aceitável — frete fica uma estimativa, não exato. Categoria sem mapeamento explícito cai no `DEFAULT_BOX` (caixa média).
+
+CEP de origem fixo em `ORIGIN_POSTAL_CODE` (89205-800) — mesmo padrão de constante fixa usado em `src/lib/whatsapp.ts`, não é variável de ambiente. Ainda não ligado no checkout (`shipping_cents` continua fixo em 0 em `create-order.ts`) — falta a UI de cotação no `CheckoutForm`/`checkout/page.tsx` e a revalidação server-side do valor escolhido.
 
 ## Painel de admin (`/admin/pedidos`)
 

@@ -204,6 +204,30 @@ export type Database = {
         }
         Relationships: []
       }
+      melhor_envio_tokens: {
+        Row: {
+          access_token: string
+          expires_at: string
+          id: boolean
+          refresh_token: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          expires_at: string
+          id?: boolean
+          refresh_token: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          expires_at?: string
+          id?: boolean
+          refresh_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_item_files: {
         Row: {
           content_type: string | null
@@ -451,6 +475,7 @@ export type Database = {
           product_id: string
           quantity: number
           sort_order: number
+          weight_grams: number | null
         }
         Insert: {
           attributes?: Json
@@ -462,6 +487,7 @@ export type Database = {
           product_id: string
           quantity: number
           sort_order?: number
+          weight_grams?: number | null
         }
         Update: {
           attributes?: Json
@@ -473,6 +499,7 @@ export type Database = {
           product_id?: string
           quantity?: number
           sort_order?: number
+          weight_grams?: number | null
         }
         Relationships: [
           {
