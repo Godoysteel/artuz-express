@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$InputDirectory = "data/supplier/atualcard",
   [string]$OutputPath = "data/supplier/atualcard-catalog.json"
 )
@@ -166,14 +166,12 @@ foreach ($product in $masterProducts) {
   if ($baseSlug.Length -gt 80) { $baseSlug = $baseSlug.Substring(0, 80).Trim("-") }
   $productSlug = "$baseSlug-$(Get-ShortHash "$categoryName|$($product.name)")"
 
+  # Publica todas as quantidades que o fornecedor oferece, incluindo lotes
+  # abaixo de 10 — a Artuz vende a partir da mesma quantidade mínima que a
+  # Atual Card, sem impor um piso artificial de 10 unidades.
   $eligibleVariants = [Collections.Generic.List[object]]::new()
-  foreach ($configuration in ($product.variants | Group-Object specification)) {
-    $hasCommercialLot = @($configuration.Group | Where-Object { $_.quantity -ge 10 }).Count -gt 0
-    foreach ($variant in $configuration.Group) {
-      if (-not $hasCommercialLot -or $variant.quantity -ge 10) {
-        $eligibleVariants.Add($variant)
-      }
-    }
+  foreach ($variant in $product.variants) {
+    $eligibleVariants.Add($variant)
   }
 
   if (-not $eligibleVariants.Count) { continue }
@@ -210,7 +208,7 @@ $catalog = [ordered]@{
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
   markup_percent = 200
   price_multiplier = $markupMultiplier
-  minimum_rule = "Quando a configuração oferece lote de 10 ou mais unidades, opções abaixo de 10 não são publicadas."
+  minimum_rule = "Nenhuma — publica a mesma quantidade mínima que a Atual Card oferece para cada configuração."
   products = $catalogProducts
 }
 
