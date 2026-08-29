@@ -67,6 +67,7 @@ Depois de um `catalog:sync`, dois problemas recorrentes precisam ser corrigidos 
   ```sql
   select category_id, name, count(*) from products group by category_id, name having count(*) > 1;
   ```
+- **SKUs reduzidos por decisão do cliente** — a categoria Adesivos tinha 36 produtos "Adesivo para Vitrine Transparente ..." (um por tema/tamanho fixo: Natal, Dia das Mães, Dia dos Pais, Volta às Aulas, formatos, etc.), todos com 1 variante só. A pedido do cliente, mantivemos só o genérico "Adesivo Transparente" (precificado por m², slug `adesivo-para-vitrine-transparente-por-m-bf4c6630`) e apagamos os outros 35. **Um novo `catalog:sync` recriaria esses 35 a partir da planilha do fornecedor** — se isso acontecer, apagar de novo em vez de manter.
 - **Imagens por família/subfamília** — `scripts/sync-atualcard-family-images.mjs` (todas as categorias) e `scripts/sync-atualcard-business-card-images.mjs` (só Cartões de Visita) mapeiam produto → imagem por palavra-chave no nome. Ao adicionar imagens novas em `public/produtos/catalogo-atualcard/`, atualizar o mapa de regras no script correspondente antes de rodar.
 
 ## Configurador de produto
