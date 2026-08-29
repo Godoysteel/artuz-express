@@ -15,11 +15,11 @@ const SLIDES = [
     image: "/produtos/catalogo-atualcard/familia-cartoes-de-visita.png",
   },
   {
-    title: "Material de campanha para 2026",
-    subtitle: "Santinhos, adesivos e banners para sua campanha eleitoral.",
-    href: "/categorias/eleicoes-2026",
-    cta: "Ver eleições 2026",
-    image: "/produtos/catalogo-atualcard/familia-santinho-eleitoral-9x5.png",
+    title: "Adesivos personalizados para todo tipo de uso",
+    subtitle: "Diversos formatos e tamanhos, com acabamento profissional.",
+    href: "/categorias/adesivos",
+    cta: "Ver adesivos",
+    image: "/produtos/catalogo-atualcard/familia-adesivos.png",
   },
   {
     title: "Banners e lonas de alta resistência",
