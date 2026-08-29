@@ -6,13 +6,16 @@ if (!supabaseUrl || !serviceRoleKey) {
   throw new Error("Credenciais do Supabase são obrigatórias.");
 }
 
+// Ordem importa: regras de material/acabamento específico vêm primeiro,
+// os fallbacks genéricos ("mini cartão", "cartão duplo", "couchê/supremo")
+// ficam por último — senão um "Cartão Duplo Kraft" ou "Mini Cartões
+// Reciclato" cai no fallback genérico antes de chegar na regra certa.
 const imageRules = [
   [/verniz localizado.*hot stamping|hot stamping.*verniz localizado/, "familia-cartao-verniz-hot-stamping.png"],
   [/dois cantos arredondados/, "familia-cartao-dois-cantos.png"],
   [/cantos arredondados/, "familia-cartao-cantos-arredondados.png"],
   [/cartao de agradecimento/, "familia-cartao-agradecimento.png"],
   [/cartao de retrovisor/, "familia-cartao-retrovisor.png"],
-  [/cartao duplo/, "familia-cartao-duplo.png"],
   [/cartao fidelidade/, "familia-cartao-fidelidade.png"],
   [/verniz localizado|uv localizado/, "familia-cartao-verniz-localizado.png"],
   [/holografic/, "familia-cartao-holografico.png"],
@@ -20,11 +23,12 @@ const imageRules = [
   [/kraft/, "familia-cartao-kraft.png"],
   [/metal premium/, "familia-cartao-metal-premium.png"],
   [/metalizado/, "familia-cartao-metalizado.png"],
-  [/mini cartao/, "familia-mini-cartao-visita.png"],
   [/ultra premium|700g/, "familia-cartao-ultra-premium.png"],
   [/premium|600g/, "familia-cartao-premium.png"],
   [/pvc/, "familia-cartao-pvc.png"],
   [/reciclato/, "familia-cartao-reciclato.png"],
+  [/mini cart/, "familia-mini-cartao-visita.png"],
+  [/cartao duplo/, "familia-cartao-duplo.png"],
   [/couche|supremo|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
 ];
 
