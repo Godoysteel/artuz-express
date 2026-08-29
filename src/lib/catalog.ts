@@ -8,7 +8,6 @@ export type CategoryCard = {
   name: string;
   imageUrl: string | null;
   minPriceCents: number | null;
-  minVariantLabel: string | null;
 };
 
 export async function getCategoriesWithStartingPrice(): Promise<CategoryCard[]> {
@@ -19,7 +18,7 @@ export async function getCategoriesWithStartingPrice(): Promise<CategoryCard[]> 
       .select("id, slug, name, image_url, sort_order")
       .eq("is_active", true)
       .order("sort_order", { ascending: true }),
-    supabase.from("category_starting_prices").select("category_id, min_price_cents, min_variant_label"),
+    supabase.from("category_starting_prices").select("category_id, min_price_cents"),
   ]);
 
   if (error || !categories) return [];
@@ -34,7 +33,6 @@ export async function getCategoriesWithStartingPrice(): Promise<CategoryCard[]> 
       name: c.name,
       imageUrl: c.image_url,
       minPriceCents: price?.min_price_cents ?? null,
-      minVariantLabel: price?.min_variant_label ?? null,
     };
   });
 }
@@ -56,7 +54,6 @@ export type ProductCard = {
   name: string;
   imageUrl: string | null;
   minPriceCents: number | null;
-  minVariantLabel: string | null;
 };
 
 export async function getProductsByCategorySlug(slug: string): Promise<ProductCard[]> {
@@ -76,7 +73,7 @@ export async function getProductsByCategorySlug(slug: string): Promise<ProductCa
 
   const { data: prices } = await supabase
     .from("product_starting_prices")
-    .select("product_id, min_price_cents, min_variant_label")
+    .select("product_id, min_price_cents")
     .in("product_id", products.map((p) => p.id));
 
   const priceByProduct = new Map((prices ?? []).map((p) => [p.product_id, p]));
@@ -90,7 +87,6 @@ export async function getProductsByCategorySlug(slug: string): Promise<ProductCa
       name: p.name,
       imageUrl: images[0]?.url ?? null,
       minPriceCents: price?.min_price_cents ?? null,
-      minVariantLabel: price?.min_variant_label ?? null,
     };
   });
 }

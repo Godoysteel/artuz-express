@@ -22,7 +22,7 @@ export default async function SearchPage({
   const { data: prices } = products?.length
     ? await supabase
         .from("product_starting_prices")
-        .select("product_id, min_price_cents, min_variant_label")
+        .select("product_id, min_price_cents")
         .in("product_id", products.map((p) => p.id))
     : { data: [] };
   const priceByProduct = new Map((prices ?? []).map((p) => [p.product_id, p]));
@@ -36,7 +36,6 @@ export default async function SearchPage({
       name: p.name,
       imageUrl: images[0]?.url ?? null,
       minPriceCents: price?.min_price_cents ?? null,
-      minVariantLabel: price?.min_variant_label ?? null,
     };
   });
 

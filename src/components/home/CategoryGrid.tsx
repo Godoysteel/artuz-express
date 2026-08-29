@@ -31,7 +31,7 @@ export function CategoryGrid({ categories }: { categories: CategoryCard[] }) {
           <div className="p-4">
             <h3 className="font-semibold text-ink">{category.name}</h3>
             <div className="mt-1">
-              <PriceFrom cents={category.minPriceCents} variantLabel={category.minVariantLabel} />
+              <PriceFrom cents={category.minPriceCents} />
             </div>
           </div>
         </Link>

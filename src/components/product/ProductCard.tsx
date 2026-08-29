@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
       <div className="p-4">
         <h3 className="font-semibold text-ink">{product.name}</h3>
         <div className="mt-1">
-          <PriceFrom cents={product.minPriceCents} variantLabel={product.minVariantLabel} />
+          <PriceFrom cents={product.minPriceCents} />
         </div>
       </div>
     </Link>
