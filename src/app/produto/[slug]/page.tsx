@@ -1,10 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
-import { PackageOpen } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
 import { CategoryProductJump } from "@/components/product/CategoryProductJump";
+import { ImageGallery } from "@/components/product/ImageGallery";
 import {
   getCategoriesWithStartingPrice,
   getProductBySlug,
@@ -25,8 +24,6 @@ export default async function ProductPage({
     getProductsByCategorySlug(product.category.slug),
   ]);
 
-  const cover = product.images[0];
-
   return (
     <Container className="py-8">
       <nav className="text-sm text-slate-500">
@@ -42,22 +39,7 @@ export default async function ProductPage({
       </nav>
 
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
-        <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-100">
-          {cover ? (
-            <Image
-              src={cover.url}
-              alt={cover.alt ?? product.name}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-              preload
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-50 text-brand/40">
-              <PackageOpen className="h-24 w-24" />
-            </div>
-          )}
-        </div>
+        <ImageGallery images={product.images} productName={product.name} />
 
         <div>
           <h1 className="text-3xl font-bold text-ink">{product.name}</h1>
