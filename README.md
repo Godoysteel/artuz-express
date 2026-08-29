@@ -26,7 +26,7 @@ Abre em [http://localhost:3000](http://localhost:3000).
 | `NEXT_PUBLIC_SUPABASE_URL` | Painel Supabase → Project Settings → API |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Painel Supabase → Project Settings → API (publishable key) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Painel Supabase → Project Settings → API (**secret**, nunca expor ao client) |
-| `MERCADOPAGO_ACCESS_TOKEN` | [Painel de devs do Mercado Pago](https://www.mercadopago.com.br/developers/panel) → aplicação → Credenciais de teste/produção. **Ainda não configurado** — o checkout falha de forma controlada até essa variável existir. |
+| `MERCADOPAGO_ACCESS_TOKEN` | [Painel de devs do Mercado Pago](https://www.mercadopago.com.br/developers/panel) → aplicação "Artuz express" → Credenciais de teste/produção. Configurado em 2026-08-29 com credenciais de **produção** (a ativação de credenciais de teste/sandbox trava com erro `DXT40` recorrente no painel do Mercado Pago — produção funcionou normalmente pelo mesmo painel). Como é produção, qualquer teste de checkout usa dinheiro de verdade se completado; verificar só até a tela de pagamento do Mercado Pago é suficiente pra confirmar que a integração funciona. |
 | `NEXT_PUBLIC_SITE_URL` | URL pública do site (usada nos `back_urls`/webhook do Mercado Pago) |
 
 Veja `.env.local.example` para o formato completo.
@@ -96,6 +96,10 @@ Depois de um `catalog:sync`, dois problemas recorrentes precisam ser corrigidos 
 ## Pagamento (Mercado Pago)
 
 Checkout Pro (redirecionamento): `src/lib/checkout/create-order.ts` recalcula tudo no servidor, cria o pedido (`status: pending`) e a preferência de pagamento; `src/app/api/webhooks/mercadopago/route.ts` recebe a confirmação e atualiza o status do pedido. Depende de `MERCADOPAGO_ACCESS_TOKEN` — sem essa variável, o checkout falha com uma mensagem clara em vez de quebrar silenciosamente.
+
+`NEXT_PUBLIC_SITE_URL` **precisa** ser uma URL pública em HTTPS (ex: `https://artuzexpress.com.br`) — o Mercado Pago rejeita a criação da preferência (`invalid_auto_return`) se `back_urls.success` apontar pra `localhost`. Configurado na Vercel (produção) em 2026-08-29; localmente o `.env.local` também aponta pro domínio real (não `localhost:3000`) pelo mesmo motivo — o retorno automático depois do pagamento só funciona voltando pro domínio de verdade de qualquer forma.
+
+Testado ponta a ponta em 2026-08-29 (produção): pedido criado → preferência criada → redirecionou pra tela real de pagamento do Mercado Pago com o item/valor corretos. Não foi concluído nenhum pagamento de teste (credenciais são de produção, então completar geraria uma cobrança real).
 
 ## Deploy
 

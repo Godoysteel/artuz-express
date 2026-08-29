@@ -98,9 +98,8 @@ export function CheckoutForm() {
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div>
             <input
-              {...register("cep", {
-                onChange: (e) => (e.target.value = maskCep(e.target.value)),
-              })}
+              {...register("cep")}
+              onChange={(e) => setValue("cep", maskCep(e.target.value), { shouldValidate: true })}
               onBlur={handleCepBlur}
               placeholder="CEP"
               maxLength={9}
