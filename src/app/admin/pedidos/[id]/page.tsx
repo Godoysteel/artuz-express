@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { formatCents } from "@/lib/format";
 import { STATUS_LABEL } from "@/lib/orders/status";
 import { StatusSelect } from "@/components/admin/StatusSelect";
+import { ARTWORK_BUCKET } from "@/lib/orders/files";
 
 export default async function AdminOrderDetailPage({
   params,
@@ -30,6 +31,31 @@ export default async function AdminOrderDetailPage({
     .from("order_items")
     .select("id, product_name, variant_label, quantity, unit_price_cents, total_price_cents, selected_addons")
     .eq("order_id", id);
+
+  const { data: files } = items?.length
+    ? await service
+        .from("order_item_files")
+        .select("id, order_item_id, file_path, file_name, uploaded_at")
+        .in(
+          "order_item_id",
+          items.map((i) => i.id),
+        )
+    : { data: [] };
+
+  const filesByItem = new Map<string, { id: string; file_path: string; file_name: string; uploaded_at: string }[]>();
+  for (const file of files ?? []) {
+    const list = filesByItem.get(file.order_item_id) ?? [];
+    list.push(file);
+    filesByItem.set(file.order_item_id, list);
+  }
+
+  const fileUrlById = new Map<string, string>();
+  for (const file of files ?? []) {
+    const { data: signed } = await service.storage
+      .from(ARTWORK_BUCKET)
+      .createSignedUrl(file.file_path, 300);
+    if (signed) fileUrlById.set(file.id, signed.signedUrl);
+  }
 
   const address = order.shipping_address as {
     cep: string;
@@ -67,20 +93,41 @@ export default async function AdminOrderDetailPage({
         <div className="rounded-xl border border-slate-200 bg-white p-5 lg:col-span-2">
           {items?.map((item) => {
             const selectedAddons = (item.selected_addons ?? []) as unknown as { label: string }[];
+            const itemFiles = filesByItem.get(item.id) ?? [];
             return (
-              <div key={item.id} className="flex justify-between border-b border-slate-100 py-3 last:border-0">
-                <div>
-                  <p className="font-medium text-ink">{item.product_name}</p>
-                  <p className="text-sm text-slate-500">
-                    {item.variant_label} × {item.quantity}
-                  </p>
-                  {selectedAddons.length > 0 && (
-                    <p className="text-xs text-slate-400">
-                      {selectedAddons.map((a) => a.label).join(", ")}
+              <div key={item.id} className="border-b border-slate-100 py-3 last:border-0">
+                <div className="flex justify-between">
+                  <div>
+                    <p className="font-medium text-ink">{item.product_name}</p>
+                    <p className="text-sm text-slate-500">
+                      {item.variant_label} × {item.quantity}
                     </p>
-                  )}
+                    {selectedAddons.length > 0 && (
+                      <p className="text-xs text-slate-400">
+                        {selectedAddons.map((a) => a.label).join(", ")}
+                      </p>
+                    )}
+                  </div>
+                  <p className="font-semibold text-ink">{formatCents(item.total_price_cents)}</p>
                 </div>
-                <p className="font-semibold text-ink">{formatCents(item.total_price_cents)}</p>
+                {itemFiles.length > 0 ? (
+                  <ul className="mt-2 space-y-1">
+                    {itemFiles.map((file) => (
+                      <li key={file.id} className="text-sm">
+                        <a
+                          href={fileUrlById.get(file.id)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-brand hover:underline"
+                        >
+                          {file.file_name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-xs text-slate-400">Nenhuma arte enviada ainda.</p>
+                )}
               </div>
             );
           })}

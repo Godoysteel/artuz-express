@@ -109,6 +109,14 @@ Lista todos os pedidos (`/admin/pedidos`) e o detalhe de cada um (itens, endere�
 
 Conta de admin criada em 2026-08-29 (`godoysteelframe@gmail.com`, auth.users). Se precisar recriar ou trocar a senha, usar `supabase.auth.admin.createUser`/`updateUserById` com a service role key — não existe fluxo de "esqueci minha senha" no site ainda.
 
+## Upload de arte e serviço de design
+
+Cliente logado envia a arte de cada item do pedido em `/pedidos/[id]` assim que o pagamento é confirmado (não antes — `pending`/`payment_failed` não liberam upload). Arquivo vai direto do navegador pro Storage do Supabase via signed upload URL (`storage.createSignedUploadUrl` + `uploadToSignedUrl` no client) — o servidor nunca recebe os bytes do arquivo, então não esbarra em limite de tamanho de request do Vercel. Formatos aceitos: PDF, PNG, JPG, JPEG, AI, PSD, SVG, CDR, EPS; até 25 MB (`src/lib/orders/files.ts`).
+
+Bucket `artes-pedidos` no Storage é **privado**, sem nenhuma policy de RLS liberando client direto — toda leitura/escrita passa por `src/lib/orders/upload-actions.ts` (server actions), que confere a dono do pedido (`orders.user_id = auth.uid()`) antes de gerar a signed URL. Download (cliente e admin) também usa signed URL (5 min de validade), gerada no server component na hora de montar a página.
+
+Adicional "Nossos designers fazem a arte pra você" (R$70,00 fixo + 3 dias) foi inserido em todo produto ativo em 2026-08-29 via SQL direto (não tem script — se precisar re-rodar pra produtos novos, repetir o mesmo `insert ... select id from products where is_active`). Quando o cliente escolhe esse adicional num item, a página do pedido troca o botão de upload por um aviso pra descrever o que quer pelo WhatsApp — comparação feita pelo texto exato do `label` em `selected_addons`, então mudar o texto do adicional quebra essa checagem (teria que atualizar `DESIGN_SERVICE_LABEL` em `src/app/pedidos/[id]/page.tsx` junto).
+
 ## Deploy
 
 ```bash
