@@ -3,16 +3,7 @@ import { redirect } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
 import { formatCents } from "@/lib/format";
-
-const STATUS_LABEL: Record<string, string> = {
-  pending: "Aguardando pagamento",
-  paid: "Pago",
-  processing: "Em produção",
-  shipped: "Enviado",
-  completed: "Concluído",
-  cancelled: "Cancelado",
-  payment_failed: "Pagamento recusado",
-};
+import { STATUS_LABEL } from "@/lib/orders/status";
 
 export default async function OrdersPage() {
   const supabase = await createClient();

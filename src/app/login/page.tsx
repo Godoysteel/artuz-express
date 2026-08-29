@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/client";
@@ -11,7 +12,16 @@ const inputClass =
   "w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-ink placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +42,8 @@ export default function LoginPage() {
     }
 
     await mergeGuestCartAction();
-    router.push("/");
+    const redirectTo = searchParams.get("redirect") ?? "/";
+    router.push(redirectTo);
     router.refresh();
   }
 

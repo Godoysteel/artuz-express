@@ -4,6 +4,7 @@ import { ShoppingCart, User } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { getCartSummary } from "@/lib/cart/cart-service";
+import { isAdmin } from "@/lib/admin/auth";
 
 const NAV_LINKS = [
   { href: "/categorias/cartoes-de-visita", label: "Cartões de Visita" },
@@ -13,7 +14,7 @@ const NAV_LINKS = [
 ];
 
 export async function Header() {
-  const { itemCount } = await getCartSummary();
+  const [{ itemCount }, admin] = await Promise.all([getCartSummary(), isAdmin()]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-ink text-white">
@@ -37,6 +38,14 @@ export async function Header() {
         </div>
 
         <div className="ml-auto flex items-center gap-4">
+          {admin && (
+            <Link
+              href="/admin/pedidos"
+              className="hidden items-center gap-1.5 text-sm text-slate-200 transition hover:text-white sm:flex"
+            >
+              Admin
+            </Link>
+          )}
           <Link
             href="/conta"
             className="hidden items-center gap-1.5 text-sm text-slate-200 transition hover:text-white sm:flex"

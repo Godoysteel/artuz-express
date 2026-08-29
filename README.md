@@ -99,7 +99,15 @@ Checkout Pro (redirecionamento): `src/lib/checkout/create-order.ts` recalcula tu
 
 `NEXT_PUBLIC_SITE_URL` **precisa** ser uma URL pública em HTTPS (ex: `https://artuzexpress.com.br`) — o Mercado Pago rejeita a criação da preferência (`invalid_auto_return`) se `back_urls.success` apontar pra `localhost`. Configurado na Vercel (produção) em 2026-08-29; localmente o `.env.local` também aponta pro domínio real (não `localhost:3000`) pelo mesmo motivo — o retorno automático depois do pagamento só funciona voltando pro domínio de verdade de qualquer forma.
 
-Testado ponta a ponta em 2026-08-29 (produção): pedido criado → preferência criada → redirecionou pra tela real de pagamento do Mercado Pago com o item/valor corretos. Não foi concluído nenhum pagamento de teste (credenciais são de produção, então completar geraria uma cobrança real).
+Testado ponta a ponta em 2026-08-29 (produção): pedido criado → preferência criada → redirecionou pra tela real de pagamento do Mercado Pago com o item/valor corretos. Cliente completou um pagamento real (pedido AE-000005, R$12,00) e o webhook atualizou o status pra "paid" automaticamente — confirma que o fluxo inteiro funciona.
+
+## Painel de admin (`/admin/pedidos`)
+
+Dono único do negócio, sem sistema de papéis — `src/lib/admin/auth.ts` libera acesso só pra quem loga com o e-mail em `ADMIN_EMAIL` (variável de ambiente; padrão `godoysteelframe@gmail.com` se não definida). Redireciona pro login se deslogado, 404 se logado mas não for o admin.
+
+Lista todos os pedidos (`/admin/pedidos`) e o detalhe de cada um (itens, endereço, contato, ID do pagamento no Mercado Pago), com um seletor pra mudar o status manualmente (Pago → Em produção → Enviado → Concluído, ou Cancelado). Pedidos com status `pending`/`payment_failed` não têm seletor — só viram gerenciáveis depois que o pagamento é confirmado. Usa `createServiceClient()` (ignora RLS) porque a policy de `orders` só deixa cada usuário ver os próprios pedidos; o próprio `requireAdmin()`/`updateOrderStatusAction` que faz a checagem de admin no lugar da RLS.
+
+Conta de admin criada em 2026-08-29 (`godoysteelframe@gmail.com`, auth.users). Se precisar recriar ou trocar a senha, usar `supabase.auth.admin.createUser`/`updateUserById` com a service role key — não existe fluxo de "esqueci minha senha" no site ainda.
 
 ## Deploy
 

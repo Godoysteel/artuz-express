@@ -1,32 +1,32 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { requireAdmin } from "@/lib/admin/auth";
+import { createServiceClient } from "@/lib/supabase/service";
 import { Container } from "@/components/ui/Container";
-import { createClient } from "@/lib/supabase/server";
 import { formatCents } from "@/lib/format";
-import { whatsappLink } from "@/lib/whatsapp";
-import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { STATUS_LABEL } from "@/lib/orders/status";
+import { StatusSelect } from "@/components/admin/StatusSelect";
 
-export default async function OrderDetailPage({
+export default async function AdminOrderDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
 
-  const { data: order } = await supabase
+  const service = createServiceClient();
+  const { data: order } = await service
     .from("orders")
-    .select("id, order_number, status, subtotal_cents, shipping_cents, total_cents, shipping_address, created_at")
+    .select(
+      "id, order_number, status, email, phone, subtotal_cents, shipping_cents, total_cents, shipping_address, mp_payment_id, mp_payment_status, created_at",
+    )
     .eq("id", id)
     .single();
 
   if (!order) notFound();
 
-  const { data: items } = await supabase
+  const { data: items } = await service
     .from("order_items")
     .select("id, product_name, variant_label, quantity, unit_price_cents, total_price_cents, selected_addons")
     .eq("order_id", id);
@@ -43,18 +43,30 @@ export default async function OrderDetailPage({
 
   return (
     <Container className="py-8">
-      <h1 className="text-2xl font-bold text-ink">Pedido {order.order_number}</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        {new Date(order.created_at).toLocaleDateString("pt-BR")} ·{" "}
-        {STATUS_LABEL[order.status] ?? order.status}
-      </p>
+      <Link href="/admin/pedidos" className="text-sm text-slate-500 hover:text-brand">
+        ← Todos os pedidos
+      </Link>
+
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-ink">Pedido {order.order_number}</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {new Date(order.created_at).toLocaleString("pt-BR")}
+          </p>
+        </div>
+        {order.status === "pending" || order.status === "payment_failed" ? (
+          <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
+            {STATUS_LABEL[order.status] ?? order.status}
+          </span>
+        ) : (
+          <StatusSelect orderId={order.id} currentStatus={order.status} />
+        )}
+      </div>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-3">
         <div className="rounded-xl border border-slate-200 bg-white p-5 lg:col-span-2">
           {items?.map((item) => {
-            const selectedAddons = (item.selected_addons ?? []) as unknown as {
-              label: string;
-            }[];
+            const selectedAddons = (item.selected_addons ?? []) as unknown as { label: string }[];
             return (
               <div key={item.id} className="flex justify-between border-b border-slate-100 py-3 last:border-0">
                 <div>
@@ -79,6 +91,13 @@ export default async function OrderDetailPage({
             <p className="text-sm font-semibold text-ink">Total</p>
             <p className="text-2xl font-bold text-ink">{formatCents(order.total_cents)}</p>
           </div>
+
+          <div>
+            <p className="text-sm font-semibold text-ink">Contato</p>
+            <p className="text-sm text-slate-600">{order.email}</p>
+            {order.phone && <p className="text-sm text-slate-600">{order.phone}</p>}
+          </div>
+
           {address && (
             <div>
               <p className="text-sm font-semibold text-ink">Endereço de entrega</p>
@@ -92,18 +111,15 @@ export default async function OrderDetailPage({
               </p>
             </div>
           )}
-          <div className="border-t border-slate-100 pt-4">
-            <p className="text-sm font-semibold text-ink">Dúvidas sobre esse pedido?</p>
-            <a
-              href={whatsappLink(`Olá! Tenho uma dúvida sobre o pedido ${order.order_number}.`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105"
-            >
-              <WhatsAppIcon className="size-4" />
-              Falar no WhatsApp
-            </a>
-          </div>
+
+          {order.mp_payment_id && (
+            <div>
+              <p className="text-sm font-semibold text-ink">Pagamento</p>
+              <p className="text-sm text-slate-600">
+                Mercado Pago #{order.mp_payment_id} — {order.mp_payment_status}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </Container>
