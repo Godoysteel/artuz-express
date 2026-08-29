@@ -21,8 +21,15 @@ const imageRules = [
   [/verniz localizado|uv localizado/, "familia-cartao-verniz-localizado.png"],
   [/holografic/, "familia-cartao-holografico.png"],
   [/hot stamping/, "familia-cartao-hot-stamping.png"],
-  [/kraft/, "familia-cartao-kraft.png"],
+  // "Cartão Duplo" é um formato dobrado (aberto+fechado) — nenhuma das fotos
+  // de material abaixo (kraft/metalizado/supremo/reciclato) mostra a dobra,
+  // então o formato vence o material aqui: uma foto só (a de dobra) pra
+  // todo "Cartão Duplo", material vira só texto no dropdown. Exceção:
+  // Metal Premium é uma linha mais exclusiva e mantém foto própria, por
+  // isso a regra dele vem antes da regra genérica de "cartao duplo".
   [/metal premium/, "familia-cartao-metal-premium.png"],
+  [/cartao duplo/, "familia-cartao-duplo.png"],
+  [/kraft/, "familia-cartao-kraft.png"],
   [/metalizado/, "familia-cartao-metalizado.png"],
   [/ultra premium|700g/, "familia-cartao-ultra-premium.png"],
   [/premium|600g/, "familia-cartao-premium.png"],
@@ -30,7 +37,6 @@ const imageRules = [
   [/reciclato/, "familia-cartao-reciclato.png"],
   [/supremo/, "familia-cartao-supremo.png"],
   [/mini cart/, "familia-mini-cartao-visita.png"],
-  [/cartao duplo/, "familia-cartao-duplo.png"],
   [/couche|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
 ];
 

@@ -88,6 +88,11 @@ const adhesiveImageRules = [
 // os fallbacks genéricos ("mini cartão", "cartão duplo", "couchê/supremo")
 // ficam por último — senão um "Cartão Duplo Kraft" ou "Mini Cartões
 // Reciclato" cai no fallback genérico antes de chegar na regra certa.
+// Exceção: "cartao duplo" (formato dobrado) vem ANTES das regras de
+// material comuns (kraft/metalizado/supremo/reciclato), porque nenhuma
+// dessas fotos mostra a dobra — uma foto só pra "Cartão Duplo", material
+// vira só texto no dropdown. "metal premium" fica antes até de "cartao
+// duplo" porque é uma linha mais exclusiva e mantém foto própria.
 const businessCardImageRules = [
   [/verniz localizado.*hot stamping|hot stamping.*verniz localizado/, "familia-cartao-verniz-hot-stamping.png"],
   [/dois cantos arredondados/, "familia-cartao-dois-cantos.png"],
@@ -98,8 +103,9 @@ const businessCardImageRules = [
   [/verniz localizado|uv localizado/, "familia-cartao-verniz-localizado.png"],
   [/holografic/, "familia-cartao-holografico.png"],
   [/hot stamping/, "familia-cartao-hot-stamping.png"],
-  [/kraft/, "familia-cartao-kraft.png"],
   [/metal premium/, "familia-cartao-metal-premium.png"],
+  [/cartao duplo/, "familia-cartao-duplo.png"],
+  [/kraft/, "familia-cartao-kraft.png"],
   [/metalizado/, "familia-cartao-metalizado.png"],
   [/ultra premium|700g/, "familia-cartao-ultra-premium.png"],
   [/premium|600g/, "familia-cartao-premium.png"],
@@ -107,7 +113,6 @@ const businessCardImageRules = [
   [/reciclato/, "familia-cartao-reciclato.png"],
   [/supremo/, "familia-cartao-supremo.png"],
   [/mini cart/, "familia-mini-cartao-visita.png"],
-  [/cartao duplo/, "familia-cartao-duplo.png"],
   [/couche|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
 ];
 
