@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const onlySupremo = process.argv.includes("--only=supremo");
 if (!supabaseUrl || !serviceRoleKey) {
   throw new Error("Credenciais do Supabase são obrigatórias.");
 }
@@ -27,9 +28,10 @@ const imageRules = [
   [/premium|600g/, "familia-cartao-premium.png"],
   [/pvc/, "familia-cartao-pvc.png"],
   [/reciclato/, "familia-cartao-reciclato.png"],
+  [/supremo/, "familia-cartao-supremo.png"],
   [/mini cart/, "familia-mini-cartao-visita.png"],
   [/cartao duplo/, "familia-cartao-duplo.png"],
-  [/couche|supremo|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
+  [/couche|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
 ];
 
 function normalize(value) {
@@ -64,8 +66,12 @@ for (let offset = 0; ; offset += 1000) {
   if (data.length < 1000) break;
 }
 
-for (let index = 0; index < products.length; index += 200) {
-  const batch = products.slice(index, index + 200);
+const targetProducts = onlySupremo
+  ? products.filter((product) => normalize(`${product.name} ${product.slug ?? ""}`).includes("supremo"))
+  : products;
+
+for (let index = 0; index < targetProducts.length; index += 200) {
+  const batch = targetProducts.slice(index, index + 200);
   const ids = batch.map(({ id }) => id);
   const { error: deleteError } = await supabase
     .from("product_images")
@@ -85,10 +91,10 @@ for (let index = 0; index < products.length; index += 200) {
   if (insertError) throw insertError;
 }
 
-const counts = products.reduce((result, product) => {
+const counts = targetProducts.reduce((result, product) => {
   const image = resolveImage(product);
   result[image] = (result[image] ?? 0) + 1;
   return result;
 }, {});
-console.log(`${products.length} cartões de visita sincronizados.`);
+console.log(`${targetProducts.length} cartões de visita sincronizados.`);
 console.table(counts);

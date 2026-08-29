@@ -105,9 +105,10 @@ const businessCardImageRules = [
   [/premium|600g/, "familia-cartao-premium.png"],
   [/pvc/, "familia-cartao-pvc.png"],
   [/reciclato/, "familia-cartao-reciclato.png"],
+  [/supremo/, "familia-cartao-supremo.png"],
   [/mini cart/, "familia-mini-cartao-visita.png"],
   [/cartao duplo/, "familia-cartao-duplo.png"],
-  [/couche|supremo|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
+  [/couche|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
 ];
 
 function normalize(value) {
