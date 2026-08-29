@@ -130,6 +130,7 @@ export async function addItemToCart(
   variantId: string,
   quantity = 1,
   selectedAddonIds: string[] = [],
+  artworkToken?: string,
 ) {
   const service = createServiceClient();
   const cartId = await getOrCreateCartId();
@@ -178,7 +179,10 @@ export async function addItemToCart(
   if (existingLine) {
     await service
       .from("cart_items")
-      .update({ quantity: existingLine.quantity + quantity })
+      .update({
+        quantity: existingLine.quantity + quantity,
+        ...(artworkToken ? { artwork_token: artworkToken } : {}),
+      })
       .eq("id", existingLine.id);
   } else {
     await service.from("cart_items").insert({
@@ -188,6 +192,7 @@ export async function addItemToCart(
       unit_price_cents: variant.price_cents,
       selected_addons: selectedAddons,
       addon_selection_key: addonSelectionKey,
+      artwork_token: artworkToken ?? null,
     });
   }
 }

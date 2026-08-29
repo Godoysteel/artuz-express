@@ -11,8 +11,9 @@ export async function addToCartAction(
   variantId: string,
   quantity: number,
   selectedAddonIds: string[] = [],
+  artworkToken?: string,
 ) {
-  await addItemToCart(variantId, quantity, selectedAddonIds);
+  await addItemToCart(variantId, quantity, selectedAddonIds, artworkToken);
   revalidatePath("/carrinho");
 }
 

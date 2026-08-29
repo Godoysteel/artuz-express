@@ -62,6 +62,7 @@ export type Database = {
       cart_items: {
         Row: {
           addon_selection_key: string
+          artwork_token: string | null
           cart_id: string
           created_at: string
           id: string
@@ -72,6 +73,7 @@ export type Database = {
         }
         Insert: {
           addon_selection_key?: string
+          artwork_token?: string | null
           cart_id: string
           created_at?: string
           id?: string
@@ -82,6 +84,7 @@ export type Database = {
         }
         Update: {
           addon_selection_key?: string
+          artwork_token?: string | null
           cart_id?: string
           created_at?: string
           id?: string
@@ -91,6 +94,13 @@ export type Database = {
           unit_price_cents?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "cart_items_artwork_token_fkey"
+            columns: ["artwork_token"]
+            isOneToOne: false
+            referencedRelation: "draft_artwork"
+            referencedColumns: ["token"]
+          },
           {
             foreignKeyName: "cart_items_cart_id_fkey"
             columns: ["cart_id"]
@@ -164,6 +174,33 @@ export type Database = {
           name?: string
           slug?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      draft_artwork: {
+        Row: {
+          content_type: string | null
+          created_at: string
+          file_name: string
+          file_path: string
+          size_bytes: number | null
+          token: string
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string
+          file_name: string
+          file_path: string
+          size_bytes?: number | null
+          token: string
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          size_bytes?: number | null
+          token?: string
         }
         Relationships: []
       }

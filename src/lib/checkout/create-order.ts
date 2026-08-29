@@ -4,6 +4,7 @@ import { getPreferenceClient } from "@/lib/mercadopago/client";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { computeAddonsTotalCents } from "@/lib/product/attributes";
 import type { SelectedAddonSnapshot } from "@/lib/cart/cart-service";
+import { DESIGN_SERVICE_LABEL } from "@/lib/product/design-service";
 
 export type CheckoutAddress = {
   cep: string;
@@ -36,7 +37,7 @@ export async function createOrderAndPreference(input: CheckoutInput) {
   const { data: items, error: itemsError } = await service
     .from("cart_items")
     .select(
-      `id, quantity, selected_addons,
+      `id, quantity, selected_addons, artwork_token,
        product_variants ( id, label, price_cents, products ( name ) )`,
     )
     .eq("cart_id", input.cartId);
@@ -61,12 +62,25 @@ export async function createOrderAndPreference(input: CheckoutInput) {
         selectedAddons,
         addonsTotalCents,
         totalPriceCents: item.quantity * variant.price_cents + addonsTotalCents,
+        artworkToken: item.artwork_token as string | null,
       },
     ];
   });
 
   if (lineItems.length === 0) {
     throw new CheckoutError("Carrinho vazio ou inválido.");
+  }
+
+  // Todo item precisa ou de uma arte enviada, ou do serviço de design —
+  // conferido de novo aqui (não só no client) porque nunca confiamos só na
+  // validação do formulário pra travar o fluxo de pagamento.
+  const missingArtwork = lineItems.find(
+    (line) => !line.artworkToken && !line.selectedAddons.some((a) => a.label === DESIGN_SERVICE_LABEL),
+  );
+  if (missingArtwork) {
+    throw new CheckoutError(
+      `Envie a arte ou escolha "Nossos designers fazem a arte pra você" para: ${missingArtwork.productName}.`,
+    );
   }
 
   const subtotalCents = lineItems.reduce((sum, line) => sum + line.totalPriceCents, 0);
@@ -96,21 +110,49 @@ export async function createOrderAndPreference(input: CheckoutInput) {
     throw new CheckoutError("Não foi possível criar o pedido.");
   }
 
-  const { error: orderItemsError } = await service.from("order_items").insert(
-    lineItems.map((line) => ({
-      order_id: order.id,
-      product_variant_id: line.variantId,
-      product_name: line.productName,
-      variant_label: line.variantLabel,
-      quantity: line.quantity,
-      unit_price_cents: line.unitPriceCents,
-      total_price_cents: line.totalPriceCents,
-      selected_addons: line.selectedAddons,
-    })),
-  );
+  const { data: insertedItems, error: orderItemsError } = await service
+    .from("order_items")
+    .insert(
+      lineItems.map((line) => ({
+        order_id: order.id,
+        product_variant_id: line.variantId,
+        product_name: line.productName,
+        variant_label: line.variantLabel,
+        quantity: line.quantity,
+        unit_price_cents: line.unitPriceCents,
+        total_price_cents: line.totalPriceCents,
+        selected_addons: line.selectedAddons,
+      })),
+    )
+    .select("id");
 
-  if (orderItemsError) {
+  if (orderItemsError || !insertedItems) {
     throw new CheckoutError("Não foi possível registrar os itens do pedido.");
+  }
+
+  // O insert acima preserva a ordem de lineItems, então dá pra parear pelo
+  // índice e "reclamar" a arte enviada como rascunho (draft_artwork) antes
+  // de existir um order_item de verdade pra ela apontar.
+  for (const [index, line] of lineItems.entries()) {
+    if (!line.artworkToken) continue;
+    const orderItemId = insertedItems[index]?.id;
+    if (!orderItemId) continue;
+
+    const { data: draft } = await service
+      .from("draft_artwork")
+      .select("file_path, file_name, content_type, size_bytes")
+      .eq("token", line.artworkToken)
+      .maybeSingle();
+    if (!draft) continue;
+
+    await service.from("order_item_files").insert({
+      order_item_id: orderItemId,
+      file_path: draft.file_path,
+      file_name: draft.file_name,
+      content_type: draft.content_type,
+      size_bytes: draft.size_bytes,
+    });
+    await service.from("draft_artwork").delete().eq("token", line.artworkToken);
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";

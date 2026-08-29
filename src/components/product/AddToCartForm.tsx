@@ -15,6 +15,8 @@ import {
 import { AttributeSelect } from "@/components/product/AttributeSelect";
 import { QuantityTierList } from "@/components/product/QuantityTierList";
 import { AddonChecklist } from "@/components/product/AddonChecklist";
+import { ArtworkUpload } from "@/components/product/ArtworkUpload";
+import { DESIGN_SERVICE_LABEL } from "@/lib/product/design-service";
 
 export function AddToCartForm({
   variants,
@@ -36,6 +38,8 @@ export function AddToCartForm({
   const [qty, setQty] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [added, setAdded] = useState(false);
+  const [artworkToken, setArtworkToken] = useState(() => crypto.randomUUID());
+  const [artworkFileName, setArtworkFileName] = useState<string | null>(null);
 
   const candidateVariants = useMemo(
     () =>
@@ -81,12 +85,23 @@ export function AddToCartForm({
   const addonList = addons.filter((a) => a.kind === "addon");
   const serviceList = addons.filter((a) => a.kind === "service");
 
+  const designServiceAddon = addons.find((a) => a.label === DESIGN_SERVICE_LABEL);
+  const hasDesignService = !!designServiceAddon && selectedAddonIds.has(designServiceAddon.id);
+  const hasArtwork = hasDesignService || !!artworkFileName;
+
   function handleAdd() {
-    if (!selected) return;
+    if (!selected || !hasArtwork) return;
     setAdded(false);
     startTransition(async () => {
-      await addToCartAction(selected.id, qty, [...selectedAddonIds]);
+      await addToCartAction(
+        selected.id,
+        qty,
+        [...selectedAddonIds],
+        !hasDesignService && artworkFileName ? artworkToken : undefined,
+      );
       setAdded(true);
+      setArtworkFileName(null);
+      setArtworkToken(crypto.randomUUID());
       router.refresh();
     });
   }
@@ -118,6 +133,13 @@ export function AddToCartForm({
         selectedIds={selectedAddonIds}
         onToggle={toggleAddon}
       />
+      <ArtworkUpload
+        token={artworkToken}
+        disabled={hasDesignService}
+        fileName={artworkFileName}
+        onFileChange={setArtworkFileName}
+      />
+
       <AddonChecklist
         title="Serviços Opcionais"
         addons={serviceList}
@@ -153,14 +175,22 @@ export function AddToCartForm({
         <p className="text-2xl font-bold text-ink">{formatCents(totalCents)}</p>
       </div>
 
-      <button
-        type="button"
-        onClick={handleAdd}
-        disabled={isPending}
-        className="w-full rounded-full bg-gradient-to-r from-brand to-accent-dark px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105 disabled:opacity-60 sm:w-auto"
-      >
-        {isPending ? "Adicionando..." : added ? "Adicionado ✓" : "Adicionar ao carrinho"}
-      </button>
+      <div>
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={isPending || !hasArtwork}
+          className="w-full rounded-full bg-gradient-to-r from-brand to-accent-dark px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105 disabled:opacity-60 sm:w-auto"
+        >
+          {isPending ? "Adicionando..." : added ? "Adicionado ✓" : "Adicionar ao carrinho"}
+        </button>
+        {!hasArtwork && (
+          <p className="mt-2 text-xs text-slate-500">
+            Envie o arquivo de arte ou escolha &quot;Nossos designers fazem a arte pra você&quot; pra
+            continuar.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

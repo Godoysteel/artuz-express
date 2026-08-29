@@ -8,8 +8,7 @@ import { STATUS_LABEL } from "@/lib/orders/status";
 import { ARTWORK_BUCKET } from "@/lib/orders/files";
 import { FileUploadForm } from "@/components/pedidos/FileUploadForm";
 import { createServiceClient } from "@/lib/supabase/service";
-
-const DESIGN_SERVICE_LABEL = "Nossos designers fazem a arte pra você";
+import { DESIGN_SERVICE_LABEL } from "@/lib/product/design-service";
 
 export default async function OrderDetailPage({
   params,
