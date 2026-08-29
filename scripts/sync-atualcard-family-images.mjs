@@ -116,6 +116,20 @@ const businessCardImageRules = [
   [/couche|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
 ];
 
+const bannerImageRules = [
+  [/lona grande formato/, "familia-lona-grande-formato.png"],
+  [/banner com suporte tripe|banner.*tripe/, "familia-banner-tripe.png"],
+  [/mini banner/, "familia-mini-banner.png"],
+  [/wind banner/, "familia-wind-banner-real.png"],
+  [/bandeiras|bandeirolas/, "familia-bandeiras-bandeirolas-real.png"],
+  [/backdrop/, "familia-backdrop-lona.png"],
+  [/cavalete/, "familia-cavalete.png"],
+  [/faixa/, "familia-faixa-lona.png"],
+  [/roll[ -]?up/, "familia-roll-up.png"],
+  [/banner/, "familia-banner-bastao.png"],
+  [/lona/, "familia-lona-impressa.png"],
+];
+
 function normalize(value) {
   return value
     .normalize("NFD")
@@ -131,6 +145,11 @@ function resolveAdhesiveImage(product) {
 function resolveBusinessCardImage(product) {
   const searchable = normalize(`${product.name} ${product.slug ?? ""}`);
   return businessCardImageRules.find(([pattern]) => pattern.test(searchable))?.[1];
+}
+
+function resolveBannerImage(product) {
+  const searchable = normalize(`${product.name} ${product.slug ?? ""}`);
+  return bannerImageRules.find(([pattern]) => pattern.test(searchable))?.[1];
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -181,6 +200,8 @@ const rows = products.map((product) => {
     ? resolveAdhesiveImage(product) ?? familyImages[categorySlug]
     : categorySlug === "cartoes-de-visita"
       ? resolveBusinessCardImage(product) ?? familyImages[categorySlug]
+      : categorySlug === "banners-e-lonas"
+        ? resolveBannerImage(product) ?? familyImages[categorySlug]
       : familyImages[categorySlug];
   return {
     product_id: product.id,
