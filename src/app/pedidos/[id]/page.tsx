@@ -2,6 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
 import { formatCents } from "@/lib/format";
+import { whatsappLink } from "@/lib/whatsapp";
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "Aguardando pagamento",
@@ -99,6 +101,18 @@ export default async function OrderDetailPage({
               </p>
             </div>
           )}
+          <div className="border-t border-slate-100 pt-4">
+            <p className="text-sm font-semibold text-ink">Dúvidas sobre esse pedido?</p>
+            <a
+              href={whatsappLink(`Olá! Tenho uma dúvida sobre o pedido ${order.order_number}.`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105"
+            >
+              <WhatsAppIcon className="size-4" />
+              Falar no WhatsApp
+            </a>
+          </div>
         </div>
       </div>
     </Container>
