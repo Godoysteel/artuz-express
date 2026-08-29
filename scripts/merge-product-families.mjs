@@ -28,7 +28,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
-const SIZE_RE = /\s+(\d+[,.]?\d*\s*x\s*\d+[,.]?\d*\s*(?:cm)?)$/i;
+const SIZE_RE = /\s+(\d+[,.]?\d*\s*x\s*\d+[,.]?\d*\s*(?:cm|mm)?)$/i;
 const AREA_RE = /\s+(por\s*cm2|por\s*m2|por\s*m²)$/i;
 
 function splitFamilyAndSize(name) {
