@@ -84,6 +84,28 @@ const adhesiveImageRules = [
   [/vinil|personalizado por m|por m2/, "familia-adesivo-vinil.png"],
 ];
 
+const businessCardImageRules = [
+  [/verniz localizado.*hot stamping|hot stamping.*verniz localizado/, "familia-cartao-verniz-hot-stamping.png"],
+  [/dois cantos arredondados/, "familia-cartao-dois-cantos.png"],
+  [/cantos arredondados/, "familia-cartao-cantos-arredondados.png"],
+  [/cartao de agradecimento/, "familia-cartao-agradecimento.png"],
+  [/cartao de retrovisor/, "familia-cartao-retrovisor.png"],
+  [/cartao duplo/, "familia-cartao-duplo.png"],
+  [/cartao fidelidade/, "familia-cartao-fidelidade.png"],
+  [/verniz localizado|uv localizado/, "familia-cartao-verniz-localizado.png"],
+  [/holografic/, "familia-cartao-holografico.png"],
+  [/hot stamping/, "familia-cartao-hot-stamping.png"],
+  [/kraft/, "familia-cartao-kraft.png"],
+  [/metal premium/, "familia-cartao-metal-premium.png"],
+  [/metalizado/, "familia-cartao-metalizado.png"],
+  [/mini cartao/, "familia-mini-cartao-visita.png"],
+  [/ultra premium|700g/, "familia-cartao-ultra-premium.png"],
+  [/premium|600g/, "familia-cartao-premium.png"],
+  [/pvc/, "familia-cartao-pvc.png"],
+  [/reciclato/, "familia-cartao-reciclato.png"],
+  [/couche|supremo|cartoes de visita|cartao de visita/, "familia-cartao-couche.png"],
+];
+
 function normalize(value) {
   return value
     .normalize("NFD")
@@ -94,6 +116,11 @@ function normalize(value) {
 function resolveAdhesiveImage(product) {
   const searchable = normalize(`${product.name} ${product.slug ?? ""}`);
   return adhesiveImageRules.find(([pattern]) => pattern.test(searchable))?.[1];
+}
+
+function resolveBusinessCardImage(product) {
+  const searchable = normalize(`${product.name} ${product.slug ?? ""}`);
+  return businessCardImageRules.find(([pattern]) => pattern.test(searchable))?.[1];
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -140,9 +167,10 @@ for (let index = 0; index < productIds.length; index += 200) {
 
 const rows = products.map((product) => {
   const categorySlug = categoryById.get(product.category_id);
-  const image =
-    categorySlug === "adesivos"
-      ? resolveAdhesiveImage(product) ?? familyImages[categorySlug]
+  const image = categorySlug === "adesivos"
+    ? resolveAdhesiveImage(product) ?? familyImages[categorySlug]
+    : categorySlug === "cartoes-de-visita"
+      ? resolveBusinessCardImage(product) ?? familyImages[categorySlug]
       : familyImages[categorySlug];
   return {
     product_id: product.id,
