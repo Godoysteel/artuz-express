@@ -9,7 +9,8 @@
     "lint": "eslint",
     "catalog:download": "node scripts/download-atualcard-prices.mjs",
     "catalog:build": "pwsh -NoProfile -File scripts/build-atualcard-catalog.ps1",
-    "catalog:sync": "node --env-file=.env.local scripts/sync-atualcard-catalog.mjs"
+    "catalog:sync": "node --env-file=.env.local scripts/sync-atualcard-catalog.mjs",
+    "catalog:price-comparison": "node --env-file=.env.local scripts/gerar-planilha-comparativo-precos.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -36,6 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "xlsx": "^0.18.5"
   }
 }

@@ -53,6 +53,10 @@ npm run catalog:sync       # sincroniza esse catálogo com o banco Supabase (cat
 
 Os arquivos baixados/gerados (`data/`, `tmp/`) não são versionados — só os scripts. Produtos importados do fornecedor geralmente não têm foto ainda; o site mostra um ícone de placeholder até a imagem real ser adicionada em `product_images`.
 
+### Planilha comparativo de preços
+
+`npm run catalog:price-comparison [caminho-saida.xlsx]` gera um `.xlsx` com 1 linha por produto ativo: categoria, quantidade mínima e preço da Artuz lado a lado com a quantidade e preço equivalente do fornecedor (lidos de `product_variants.attributes.supplier_cost_cents`/`markup_percent` da variante mais barata). Produtos sem esses campos (cadastrados manualmente, sem origem no fornecedor) ficam com as colunas do Atual Card em branco. Usa o pacote `xlsx` (devDependency) — não altera o banco, só lê.
+
 ### Pós-processamento do catálogo importado
 
 Depois de um `catalog:sync`, dois problemas recorrentes precisam ser corrigidos manualmente (ou re-rodando os scripts abaixo):
