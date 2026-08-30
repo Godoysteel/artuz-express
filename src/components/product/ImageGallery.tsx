@@ -56,6 +56,8 @@ export function ImageGallery({
           ))}
         </div>
       )}
+
+      {active && <p className="mt-2 text-xs text-slate-400">*Imagem meramente ilustrativa.</p>}
     </div>
   );
 }
