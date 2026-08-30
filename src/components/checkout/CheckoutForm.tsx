@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutFormSchema, type CheckoutFormValues } from "@/lib/checkout/schema";
-import { maskCep, formatCents } from "@/lib/format";
+import { maskCep, maskCpf, formatCents } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
 type ShippingOption = {
@@ -95,6 +95,7 @@ export function CheckoutForm({ subtotalCents }: { subtotalCents: number }) {
         body: JSON.stringify({
           email: values.email,
           phone: values.phone,
+          cpf: values.cpf,
           address: {
             cep: values.cep,
             logradouro: values.logradouro,
@@ -132,6 +133,17 @@ export function CheckoutForm({ subtotalCents }: { subtotalCents: number }) {
           <div>
             <input {...register("phone")} type="tel" placeholder="Telefone / WhatsApp" className={inputClass} />
             {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>}
+          </div>
+          <div>
+            <input
+              {...register("cpf")}
+              onChange={(e) => setValue("cpf", maskCpf(e.target.value), { shouldValidate: true })}
+              placeholder="CPF"
+              maxLength={14}
+              className={inputClass}
+            />
+            {errors.cpf && <p className="mt-1 text-xs text-red-500">{errors.cpf.message}</p>}
+            <p className="mt-1 text-xs text-slate-400">Necessário para emissão da nota fiscal.</p>
           </div>
         </div>
       </div>

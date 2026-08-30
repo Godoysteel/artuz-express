@@ -20,7 +20,7 @@ export default async function AdminOrderDetailPage({
   const { data: order } = await service
     .from("orders")
     .select(
-      "id, order_number, status, email, phone, subtotal_cents, shipping_cents, total_cents, shipping_address, mp_payment_id, mp_payment_status, created_at",
+      "id, order_number, status, email, phone, cpf, subtotal_cents, shipping_cents, total_cents, shipping_address, mp_payment_id, mp_payment_status, created_at",
     )
     .eq("id", id)
     .single();
@@ -144,6 +144,13 @@ export default async function AdminOrderDetailPage({
             <p className="text-sm text-slate-600">{order.email}</p>
             {order.phone && <p className="text-sm text-slate-600">{order.phone}</p>}
           </div>
+
+          {order.cpf && (
+            <div>
+              <p className="text-sm font-semibold text-ink">CPF (nota fiscal)</p>
+              <p className="text-sm text-slate-600">{order.cpf}</p>
+            </div>
+          )}
 
           {address && (
             <div>

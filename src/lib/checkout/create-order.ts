@@ -21,6 +21,7 @@ export type CheckoutInput = {
   cartId: string;
   email: string;
   phone: string;
+  cpf: string;
   address: CheckoutAddress;
   shippingServiceId: number;
 };
@@ -108,6 +109,7 @@ export async function createOrderAndPreference(input: CheckoutInput) {
       user_id: user?.id ?? null,
       email: input.email,
       phone: input.phone,
+      cpf: input.cpf,
       subtotal_cents: subtotalCents,
       shipping_cents: shippingCents,
       total_cents: totalCents,

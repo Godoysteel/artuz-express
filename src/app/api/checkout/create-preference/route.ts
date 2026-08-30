@@ -6,6 +6,7 @@ import { CheckoutError, createOrderAndPreference } from "@/lib/checkout/create-o
 const bodySchema = z.object({
   email: z.string().email(),
   phone: z.string().min(8),
+  cpf: z.string().min(11),
   address: z.object({
     cep: z.string().min(8),
     logradouro: z.string().min(3),
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
       cartId,
       email: parsed.data.email,
       phone: parsed.data.phone,
+      cpf: parsed.data.cpf,
       address: parsed.data.address,
       shippingServiceId: parsed.data.shippingServiceId,
     });

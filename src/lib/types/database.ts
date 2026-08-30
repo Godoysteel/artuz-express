@@ -319,6 +319,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          cpf: string | null
           created_at: string
           email: string
           id: string
@@ -336,6 +337,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          cpf?: string | null
           created_at?: string
           email: string
           id?: string
@@ -353,6 +355,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          cpf?: string | null
           created_at?: string
           email?: string
           id?: string

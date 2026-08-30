@@ -138,6 +138,10 @@ Lista todos os pedidos (`/admin/pedidos`) e o detalhe de cada um (itens, endere�
 
 Conta de admin criada em 2026-08-29 (`godoysteelframe@gmail.com`, auth.users). Se precisar recriar ou trocar a senha, usar `supabase.auth.admin.createUser`/`updateUserById` com a service role key — não existe fluxo de "esqueci minha senha" no site ainda.
 
+## Nota fiscal
+
+Emissão ainda é **manual** (decisão do cliente: começar sem custo de emissor automático, migrar depois). Pra viabilizar isso, o checkout coleta CPF do cliente (`orders.cpf`, obrigatório, validado com o algoritmo real de dígito verificador em `isValidCpf` — `src/lib/format.ts`) e mostra no detalhe do pedido no admin (`/admin/pedidos/[id]`), pra quem for emitir a nota ter o dado à mão. Quando migrar pra emissão automática (Focus NFe, NFe.io, Bling...), o ponto de entrada natural é o webhook do Mercado Pago (`src/app/api/webhooks/mercadopago/route.ts`), que já é onde o pedido vira `paid` — disparar a chamada de emissão ali.
+
 ## Upload de arte e serviço de design
 
 **Obrigatório**: todo item do carrinho precisa ter uma arte enviada OU o adicional "Nossos designers fazem a arte pra você" selecionado — sem isso não dá pra finalizar a compra. Isso é a exigência de negócio (2026-08-29); a checagem existe em dois lugares:
