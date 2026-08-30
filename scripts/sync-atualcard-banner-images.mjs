@@ -2,10 +2,13 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const onlyLona = process.argv.includes("--only=lona");
 if (!supabaseUrl || !serviceRoleKey) throw new Error("Credenciais do Supabase são obrigatórias.");
 
 const imageRules = [
-  [/lona grande formato/, "familia-lona-grande-formato.png"],
+  [/lona grande formato.*com ilhos/, "familia-lona-grande-formato.png"],
+  [/lona.*com ilhos/, "familia-lona-impressa.png"],
+  [/lona grande formato/, "familia-lona-sem-ilhos.png"],
   [/banner com suporte tripe|banner.*tripe/, "familia-banner-tripe.png"],
   [/mini banner/, "familia-mini-banner.png"],
   [/wind banner/, "familia-wind-banner-real.png"],
@@ -15,7 +18,7 @@ const imageRules = [
   [/faixa/, "familia-faixa-lona.png"],
   [/roll[ -]?up/, "familia-roll-up.png"],
   [/banner/, "familia-banner-bastao.png"],
-  [/lona/, "familia-lona-impressa.png"],
+  [/lona/, "familia-lona-sem-ilhos.png"],
 ];
 
 const normalize = (value) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -40,8 +43,12 @@ for (let offset = 0; ; offset += 1000) {
   if (data.length < 1000) break;
 }
 
-for (let index = 0; index < products.length; index += 200) {
-  const batch = products.slice(index, index + 200);
+const targetProducts = onlyLona
+  ? products.filter((product) => normalize(product.name).startsWith("lona "))
+  : products;
+
+for (let index = 0; index < targetProducts.length; index += 200) {
+  const batch = targetProducts.slice(index, index + 200);
   const ids = batch.map(({ id }) => id);
   const { error: deleteError } = await supabase.from("product_images")
     .delete().in("product_id", ids).eq("sort_order", 0);
@@ -55,10 +62,10 @@ for (let index = 0; index < products.length; index += 200) {
   if (insertError) throw insertError;
 }
 
-const counts = products.reduce((result, product) => {
+const counts = targetProducts.reduce((result, product) => {
   const image = resolveImage(product);
   result[image] = (result[image] ?? 0) + 1;
   return result;
 }, {});
-console.log(`${products.length} produtos de banners e lonas sincronizados.`);
+console.log(`${targetProducts.length} produtos de banners e lonas sincronizados.`);
 console.table(counts);

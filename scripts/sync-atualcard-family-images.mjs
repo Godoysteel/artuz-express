@@ -117,7 +117,9 @@ const businessCardImageRules = [
 ];
 
 const bannerImageRules = [
-  [/lona grande formato/, "familia-lona-grande-formato.png"],
+  [/lona grande formato.*com ilhos/, "familia-lona-grande-formato.png"],
+  [/lona.*com ilhos/, "familia-lona-impressa.png"],
+  [/lona grande formato/, "familia-lona-sem-ilhos.png"],
   [/banner com suporte tripe|banner.*tripe/, "familia-banner-tripe.png"],
   [/mini banner/, "familia-mini-banner.png"],
   [/wind banner/, "familia-wind-banner-real.png"],
@@ -127,7 +129,7 @@ const bannerImageRules = [
   [/faixa/, "familia-faixa-lona.png"],
   [/roll[ -]?up/, "familia-roll-up.png"],
   [/banner/, "familia-banner-bastao.png"],
-  [/lona/, "familia-lona-impressa.png"],
+  [/lona/, "familia-lona-sem-ilhos.png"],
 ];
 
 function normalize(value) {
