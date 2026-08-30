@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/Container";
+import { getCatalogProductImage } from "@/lib/product/catalog-images";
 import { ProductCard } from "@/components/product/ProductCard";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,7 +35,7 @@ export default async function SearchPage({
       id: p.id,
       slug: p.slug,
       name: p.name,
-      imageUrl: images[0]?.url ?? null,
+      imageUrl: getCatalogProductImage(p.slug) ?? images[0]?.url ?? null,
       minPriceCents: price?.min_price_cents ?? null,
     };
   });

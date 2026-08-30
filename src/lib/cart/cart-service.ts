@@ -1,4 +1,5 @@
 import "server-only";
+import { getCatalogProductImage } from "@/lib/product/catalog-images";
 import { cookies } from "next/headers";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
@@ -251,7 +252,7 @@ export async function getCartSummary(): Promise<CartSummary> {
         product: {
           slug: product.slug,
           name: product.name,
-          imageUrl: images[0]?.url ?? null,
+          imageUrl: getCatalogProductImage(product.slug) ?? images[0]?.url ?? null,
         },
       },
     ];

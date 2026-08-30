@@ -1,4 +1,5 @@
 import "server-only";
+import { getCatalogProductImage } from "@/lib/product/catalog-images";
 import { createClient } from "@/lib/supabase/server";
 import type { AddonInfo, AttributeVariant } from "@/lib/product/attributes";
 
@@ -97,7 +98,7 @@ export async function getProductsByCategorySlug(slug: string): Promise<ProductCa
       id: p.id,
       slug: p.slug,
       name: p.name,
-      imageUrl: images[0]?.url ?? null,
+      imageUrl: getCatalogProductImage(p.slug) ?? images[0]?.url ?? null,
       minPriceCents: price?.min_price_cents ?? null,
     };
   });
@@ -163,7 +164,9 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
     name: data.name,
     description: data.description,
     category: { slug: data.categories.slug, name: data.categories.name },
-    images: images.map((i) => ({ url: i.url, alt: i.alt })),
+    images: getCatalogProductImage(data.slug)
+      ? [{ url: getCatalogProductImage(data.slug)!, alt: `${data.name} — imagem ilustrativa` }]
+      : images.map((i) => ({ url: i.url, alt: i.alt })),
     variants,
     addons,
   };
