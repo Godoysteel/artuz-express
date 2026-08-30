@@ -6,16 +6,14 @@ import { SearchBar } from "@/components/layout/SearchBar";
 import { getCartSummary } from "@/lib/cart/cart-service";
 import { isAdmin } from "@/lib/admin/auth";
 import { getPendingOrdersCount } from "@/lib/admin/queries";
-
-const NAV_LINKS = [
-  { href: "/categorias/cartoes-de-visita", label: "Cartões de Visita" },
-  { href: "/categorias/banners-e-lonas", label: "Banners e Lonas" },
-  { href: "/categorias/adesivo-dtf", label: "Adesivo DTF" },
-  { href: "/categorias/brindes-promocionais", label: "Brindes Promocionais" },
-];
+import { getAllCategoryLinks } from "@/lib/catalog";
 
 export async function Header() {
-  const [{ itemCount }, admin] = await Promise.all([getCartSummary(), isAdmin()]);
+  const [{ itemCount }, admin, categoryLinks] = await Promise.all([
+    getCartSummary(),
+    isAdmin(),
+    getAllCategoryLinks(),
+  ]);
   const pendingOrdersCount = admin ? await getPendingOrdersCount() : 0;
 
   return (
@@ -77,13 +75,13 @@ export async function Header() {
 
       <div className="border-t border-white/10 bg-ink-soft">
         <Container className="flex h-11 items-center gap-6 overflow-x-auto text-sm">
-          {NAV_LINKS.map((link) => (
+          {categoryLinks.map((category) => (
             <Link
-              key={link.href}
-              href={link.href}
+              key={category.slug}
+              href={`/categorias/${category.slug}`}
               className="shrink-0 text-slate-200 transition hover:text-accent"
             >
-              {link.label}
+              {category.name}
             </Link>
           ))}
         </Container>
