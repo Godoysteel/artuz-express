@@ -84,8 +84,25 @@ export function Footer() {
         </div>
       </Container>
 
-      <div className="border-t border-white/10 py-4 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} Artuz Express. Todos os direitos reservados.
+      <div className="flex flex-col items-center gap-2 border-t border-white/10 py-4 text-center text-xs text-slate-500">
+        <span>© {new Date().getFullYear()} Artuz Express. Todos os direitos reservados.</span>
+        <span className="flex items-center gap-2 opacity-60">
+          Arte por
+          <Image
+            src="/marketing/logo-artuz-design.png"
+            alt="Artuz Design e Comunicação"
+            width={80}
+            height={61}
+            className="h-5 w-auto rounded-sm"
+          />
+          <Image
+            src="/marketing/logo-by-godoy.png"
+            alt="By Godoy"
+            width={40}
+            height={40}
+            className="h-5 w-auto rounded-sm"
+          />
+        </span>
       </div>
     </footer>
   );
