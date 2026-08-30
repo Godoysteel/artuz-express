@@ -1,8 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Mail } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { WHATSAPP_DISPLAY, whatsappLink } from "@/lib/whatsapp";
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 export function Footer() {
   return (
@@ -27,6 +29,13 @@ export function Footer() {
           >
             <WhatsAppIcon className="size-4" />
             {WHATSAPP_DISPLAY}
+          </a>
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="mt-3 flex w-fit items-center gap-2 text-sm text-slate-400 transition hover:text-accent"
+          >
+            <Mail className="size-4" />
+            {CONTACT_EMAIL}
           </a>
         </div>
 
