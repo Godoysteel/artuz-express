@@ -117,6 +117,7 @@ const businessCardImageRules = [
 ];
 
 const bannerImageRules = [
+  [/tag para garrafa/, "familia-tag-garrafa-couche.png"],
   [/lona grande formato.*com ilhos/, "familia-lona-grande-formato.png"],
   [/lona.*com ilhos/, "familia-lona-impressa.png"],
   [/lona grande formato/, "familia-lona-sem-ilhos.png"],

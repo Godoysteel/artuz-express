@@ -3,9 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const onlyLona = process.argv.includes("--only=lona");
+const onlyTagGarrafa = process.argv.includes("--only=tag-garrafa");
 if (!supabaseUrl || !serviceRoleKey) throw new Error("Credenciais do Supabase são obrigatórias.");
 
 const imageRules = [
+  [/tag para garrafa/, "familia-tag-garrafa-couche.png"],
   [/lona grande formato.*com ilhos/, "familia-lona-grande-formato.png"],
   [/lona.*com ilhos/, "familia-lona-impressa.png"],
   [/lona grande formato/, "familia-lona-sem-ilhos.png"],
@@ -43,9 +45,11 @@ for (let offset = 0; ; offset += 1000) {
   if (data.length < 1000) break;
 }
 
-const targetProducts = onlyLona
-  ? products.filter((product) => normalize(product.name).startsWith("lona "))
-  : products;
+const targetProducts = onlyTagGarrafa
+  ? products.filter((product) => normalize(product.name).startsWith("tag para garrafa"))
+  : onlyLona
+    ? products.filter((product) => normalize(product.name).startsWith("lona "))
+    : products;
 
 for (let index = 0; index < targetProducts.length; index += 200) {
   const batch = targetProducts.slice(index, index + 200);
