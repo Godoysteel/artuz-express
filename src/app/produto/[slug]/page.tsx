@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
 import { CategoryProductJump } from "@/components/product/CategoryProductJump";
@@ -9,6 +10,35 @@ import {
   getProductBySlug,
   getProductsByCategorySlug,
 } from "@/lib/catalog";
+import { formatCents } from "@/lib/format";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+  if (!product) return {};
+
+  const minPriceCents = Math.min(...product.variants.map((v) => v.priceCents));
+  const description =
+    product.description ??
+    `${product.name} personalizado sob demanda, a partir de ${formatCents(minPriceCents)}. Peça agora na Artuz Express.`;
+  const image = product.images[0]?.url;
+
+  return {
+    title: product.name,
+    description,
+    alternates: { canonical: `/produto/${product.slug}` },
+    openGraph: {
+      title: product.name,
+      description,
+      url: `/produto/${product.slug}`,
+      images: image ? [{ url: image }] : undefined,
+    },
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -24,7 +54,30 @@ export default async function ProductPage({
     getProductsByCategorySlug(product.category.slug),
   ]);
 
+  const minPriceCents = Math.min(...product.variants.map((v) => v.priceCents));
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://artuzexpress.com.br";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description ?? undefined,
+    image: product.images.map((i) => (i.url.startsWith("http") ? i.url : `${siteUrl}${i.url}`)),
+    url: `${siteUrl}/produto/${product.slug}`,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "BRL",
+      price: (minPriceCents / 100).toFixed(2),
+      availability: "https://schema.org/InStock",
+      url: `${siteUrl}/produto/${product.slug}`,
+    },
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     <Container className="py-8">
       <nav className="text-sm text-slate-500">
         <Link href="/" className="hover:text-brand">
@@ -62,5 +115,6 @@ export default async function ProductPage({
         </div>
       </div>
     </Container>
+    </>
   );
 }

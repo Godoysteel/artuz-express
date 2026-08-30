@@ -1,7 +1,29 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { ProductCard } from "@/components/product/ProductCard";
 import { getCategoryBySlug, getProductsByCategorySlug } from "@/lib/catalog";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const category = await getCategoryBySlug(slug);
+  if (!category) return {};
+
+  const description =
+    category.description ??
+    `${category.name} personalizados sob demanda, com entrega rápida e pagamento online na Artuz Express.`;
+
+  return {
+    title: category.name,
+    description,
+    alternates: { canonical: `/categorias/${category.slug}` },
+    openGraph: { title: category.name, description, url: `/categorias/${category.slug}` },
+  };
+}
 
 export default async function CategoryPage({
   params,

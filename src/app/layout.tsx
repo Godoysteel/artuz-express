@@ -17,10 +17,31 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://artuzexpress.com.br";
+const defaultTitle = "Artuz Express | Gráfica Online";
+const defaultDescription =
+  "Cartões de visita, banners, adesivos, brindes e muito mais. Impressão rápida com pagamento online.";
+
 export const metadata: Metadata = {
-  title: "Artuz Express | Gráfica Online",
-  description:
-    "Cartões de visita, banners, adesivos, brindes e muito mais. Impressão rápida com pagamento online.",
+  metadataBase: new URL(siteUrl),
+  title: { default: defaultTitle, template: "%s | Artuz Express" },
+  description: defaultDescription,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Artuz Express",
+    title: defaultTitle,
+    description: defaultDescription,
+    url: siteUrl,
+    images: [{ url: "/logo-artuz.png", width: 1920, height: 580, alt: "Artuz Express" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: defaultTitle,
+    description: defaultDescription,
+    images: ["/logo-artuz.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

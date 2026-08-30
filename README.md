@@ -160,6 +160,16 @@ Adicional "Nossos designers fazem a arte pra você" (R$70,00 fixo + 3 dias) foi 
 
 Site cadastrado em 2026-08-29 no Cloudflare Web Analytics (conta `godoysteelframe@gmail.com`) — só o produto "Web Analytics" (snippet JS, privacy-first), sem migrar o DNS do domínio pra Cloudflare. Snippet injetado em `src/app/layout.tsx` via `next/script` (`strategy="afterInteractive"`), token do beacon fixo no código (não é segredo — é só um identificador de site, o mesmo padrão do resto de config pública do Cloudflare). Dashboard: Cloudflare → Analytics → Web Analytics → artuzexpress.com.br. Métricas aparecem com alguns minutos de atraso depois do primeiro acesso real ao site em produção.
 
+## SEO
+
+Passo gratuito pra ganhar alcance orgânico (Google) e previews decentes ao compartilhar links (WhatsApp, redes sociais) — feito em 2026-08-30, nada disso existia antes:
+
+- `src/app/robots.ts` e `src/app/sitemap.ts` (rotas nativas do Next, servidas em `/robots.txt` e `/sitemap.xml`) — o sitemap lista home, busca, todas as categorias ativas e todos os ~1000+ produtos ativos, gerado dinamicamente a partir do Supabase a cada request (não é um arquivo estático que precisa ser regenerado manualmente).
+- `metadata` do layout raiz (`src/app/layout.tsx`) ganhou `metadataBase` (pra resolver URLs relativas de imagem/OG em absolutas) e um `title.template` (`"%s | Artuz Express"`) — todo `generateMetadata` de página filha só precisa definir o título curto.
+- `generateMetadata` em `/produto/[slug]` e `/categorias/[slug]`: título, descrição (usa a descrição real do produto/categoria se existir, senão gera uma a partir do nome/preço), `alternates.canonical` e Open Graph (título/descrição/imagem) por página — sem isso, todo link do site tinha o mesmo título/descrição genérico do layout.
+- JSON-LD (`schema.org/Product`) na página de produto, com nome, imagens (URLs absolutas), descrição e `offers.price` (o menor preço entre as variantes) — isso é o que permite o Google mostrar preço/disponibilidade direto no resultado de busca (rich snippet), não só o link.
+- **Não feito ainda** (fora do escopo gratuito/técnico): Google Meu Negócio (cadastro manual, precisa ser feito pelo dono do negócio) e Google Search Console (precisa verificar propriedade do domínio — também depende de acesso do dono).
+
 ## Deploy
 
 ```bash
