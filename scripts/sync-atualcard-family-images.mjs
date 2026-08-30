@@ -117,7 +117,6 @@ const businessCardImageRules = [
 ];
 
 const bannerImageRules = [
-  [/tag para garrafa/, "familia-tag-garrafa-couche.png"],
   [/lona grande formato.*com ilhos/, "familia-lona-grande-formato.png"],
   [/lona.*com ilhos/, "familia-lona-impressa.png"],
   [/lona grande formato/, "familia-lona-sem-ilhos.png"],
@@ -131,6 +130,40 @@ const bannerImageRules = [
   [/roll[ -]?up/, "familia-roll-up.png"],
   [/banner/, "familia-banner-bastao.png"],
   [/lona/, "familia-lona-sem-ilhos.png"],
+];
+
+const promotionalGiftImageRules = [
+  [/balde de gelo/, "familia-brinde-balde-gelo.png"],
+  [/balde de pipoca/, "familia-brinde-balde-pipoca.png"],
+  [/baralho/, "familia-brinde-baralho.png"],
+  [/bloco de anotacao.*caneta/, "familia-brinde-bloco-caneta.png"],
+  [/caneca veicular/, "familia-brinde-caneca-veicular.png"],
+  [/caneca de chopp/, "familia-brinde-caneca-chopp.png"],
+  [/caneca/, "familia-brinde-caneca-cafe-polimero.png"],
+  [/caneta ecologica/, "familia-brinde-caneta-ecologica.png"],
+  [/caneta/, "familia-brinde-caneta-plastica.png"],
+  [/chaveiro cordao/, "familia-brinde-chaveiro-cordao.png"],
+  [/copo caldereta/, "familia-brinde-copo-caldereta.png"],
+  [/copo com espremedor/, "familia-brinde-copo-espremedor.png"],
+  [/copo long drink/, "familia-brinde-copo-long-drink.png"],
+  [/copo nature/, "familia-brinde-copo-nature.png"],
+  [/copo tornado/, "familia-brinde-copo-tornado.png"],
+  [/copo twister/, "familia-brinde-copo-twister.png"],
+  [/copo whisky/, "familia-brinde-copo-whisky.png"],
+  [/garrafa retro/, "familia-brinde-garrafa-retro.png"],
+  [/garrafa slim fit/, "familia-brinde-garrafa-slim-fit.png"],
+  [/garrafa squeeze/, "familia-brinde-garrafa-squeeze.png"],
+  [/mouse pad/, "familia-brinde-mouse-pad.png"],
+  [/taca de champagne/, "familia-brinde-taca-champagne.png"],
+  [/taca de gin/, "familia-brinde-taca-gin.png"],
+  [/taca de vinho/, "familia-brinde-taca-vinho.png"],
+  [/ventarola/, "familia-brinde-ventarola.png"],
+  [/viseira/, "familia-brinde-viseira.png"],
+  [/mascara/, "familia-brinde-mascara.png"],
+  [/envelope/, "familia-envelopes.png"],
+  [/manuais|catalogos/, "familia-catalogos-livretos.png"],
+  [/marcador de pagina/, "familia-marcadores-reguas.png"],
+  [/pasta com vinco/, "familia-pastas.png"],
 ];
 
 function normalize(value) {
@@ -153,6 +186,16 @@ function resolveBusinessCardImage(product) {
 function resolveBannerImage(product) {
   const searchable = normalize(`${product.name} ${product.slug ?? ""}`);
   return bannerImageRules.find(([pattern]) => pattern.test(searchable))?.[1];
+}
+
+function resolvePromotionalGiftImage(product) {
+  const searchable = normalize(`${product.name} ${product.slug ?? ""}`);
+  return promotionalGiftImageRules.find(([pattern]) => pattern.test(searchable))?.[1];
+}
+
+function resolveSpecialProductImage(product) {
+  const searchable = normalize(`${product.name} ${product.slug ?? ""}`);
+  if (/tag para garrafa/.test(searchable)) return "familia-tag-garrafa-couche.png";
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -199,13 +242,15 @@ for (let index = 0; index < productIds.length; index += 200) {
 
 const rows = products.map((product) => {
   const categorySlug = categoryById.get(product.category_id);
-  const image = categorySlug === "adesivos"
+  const image = resolveSpecialProductImage(product) ?? (categorySlug === "adesivos"
     ? resolveAdhesiveImage(product) ?? familyImages[categorySlug]
     : categorySlug === "cartoes-de-visita"
       ? resolveBusinessCardImage(product) ?? familyImages[categorySlug]
       : categorySlug === "banners-e-lonas"
         ? resolveBannerImage(product) ?? familyImages[categorySlug]
-      : familyImages[categorySlug];
+      : categorySlug === "brindes-promocionais"
+        ? resolvePromotionalGiftImage(product) ?? familyImages[categorySlug]
+      : familyImages[categorySlug]);
   return {
     product_id: product.id,
     url: `/produtos/catalogo-atualcard/${image}`,

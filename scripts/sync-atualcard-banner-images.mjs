@@ -32,14 +32,18 @@ const resolveImage = (product) => {
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
-const { data: category, error: categoryError } = await supabase
-  .from("categories").select("id").eq("slug", "banners-e-lonas").single();
-if (categoryError) throw categoryError;
-
 const products = [];
 for (let offset = 0; ; offset += 1000) {
-  const { data, error } = await supabase.from("products")
-    .select("id, name, slug").eq("category_id", category.id).range(offset, offset + 999);
+  let query = supabase.from("products").select("id, name, slug");
+  if (onlyTagGarrafa) {
+    query = query.ilike("name", "Tag para Garrafa%");
+  } else {
+    const { data: category, error: categoryError } = await supabase
+      .from("categories").select("id").eq("slug", "banners-e-lonas").single();
+    if (categoryError) throw categoryError;
+    query = query.eq("category_id", category.id);
+  }
+  const { data, error } = await query.range(offset, offset + 999);
   if (error) throw error;
   products.push(...data);
   if (data.length < 1000) break;
