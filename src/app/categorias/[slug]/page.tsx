@@ -1,8 +1,11 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { ProductCard } from "@/components/product/ProductCard";
 import { getCategoryBySlug, getProductsByCategorySlug } from "@/lib/catalog";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://artuzexpress.com.br";
 
 export async function generateMetadata({
   params,
@@ -36,9 +39,35 @@ export default async function CategoryPage({
 
   const products = await getProductsByCategorySlug(slug);
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: category.name,
+        item: `${siteUrl}/categorias/${category.slug}`,
+      },
+    ],
+  };
+
   return (
     <Container className="py-8">
-      <h1 className="text-2xl font-bold text-ink">{category.name}</h1>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <nav className="text-sm text-slate-500">
+        <Link href="/" className="hover:text-brand">
+          Home
+        </Link>
+        <span className="mx-2">/</span>
+        <span className="text-ink">{category.name}</span>
+      </nav>
+
+      <h1 className="mt-3 text-2xl font-bold text-ink">{category.name}</h1>
       {category.description && (
         <p className="mt-1 max-w-2xl text-sm text-slate-500">{category.description}</p>
       )}

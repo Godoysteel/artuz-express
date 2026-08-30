@@ -6,6 +6,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieNotice } from "@/components/layout/CookieNotice";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +46,19 @@ export const metadata: Metadata = {
   },
 };
 
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "Artuz Express",
+  image: `${siteUrl}/logo-artuz.png`,
+  url: siteUrl,
+  telephone: `+${WHATSAPP_NUMBER}`,
+  email: CONTACT_EMAIL,
+  // Área de atendimento, não loja física — mesma configuração do Google Business Profile.
+  areaServed: { "@type": "City", name: "Joinville" },
+  priceRange: "$$",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -51,6 +66,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+        />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
