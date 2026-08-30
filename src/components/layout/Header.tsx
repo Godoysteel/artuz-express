@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { getCartSummary } from "@/lib/cart/cart-service";
 import { isAdmin } from "@/lib/admin/auth";
+import { getPendingOrdersCount } from "@/lib/admin/queries";
 
 const NAV_LINKS = [
   { href: "/categorias/cartoes-de-visita", label: "Cartões de Visita" },
@@ -15,6 +16,7 @@ const NAV_LINKS = [
 
 export async function Header() {
   const [{ itemCount }, admin] = await Promise.all([getCartSummary(), isAdmin()]);
+  const pendingOrdersCount = admin ? await getPendingOrdersCount() : 0;
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-ink text-white">
@@ -41,9 +43,14 @@ export async function Header() {
           {admin && (
             <Link
               href="/admin/pedidos"
-              className="hidden items-center gap-1.5 text-sm text-slate-200 transition hover:text-white sm:flex"
+              className="relative hidden items-center gap-1.5 text-sm text-slate-200 transition hover:text-white sm:flex"
             >
               Admin
+              {pendingOrdersCount > 0 && (
+                <span className="absolute -right-3 -top-2 flex size-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-bold text-white">
+                  {pendingOrdersCount}
+                </span>
+              )}
             </Link>
           )}
           <Link
