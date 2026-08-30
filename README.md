@@ -147,6 +147,10 @@ Bucket `artes-pedidos` no Storage é **privado**, sem nenhuma policy de RLS libe
 
 Adicional "Nossos designers fazem a arte pra você" (R$70,00 fixo + 3 dias) foi inserido em todo produto ativo em 2026-08-29 via SQL direto (não tem script — se precisar re-rodar pra produtos novos, repetir o mesmo `insert ... select id from products where is_active`). A checagem "esse item já tem designer, não precisa de arte" compara o texto exato do `label` contra `DESIGN_SERVICE_LABEL` (`src/lib/product/design-service.ts`, importada tanto no client quanto em `create-order.ts`) — mudar o texto do adicional no banco quebra essa comparação, teria que atualizar a constante junto.
 
+## Estatísticas (Cloudflare Web Analytics)
+
+Site cadastrado em 2026-08-29 no Cloudflare Web Analytics (conta `godoysteelframe@gmail.com`) — só o produto "Web Analytics" (snippet JS, privacy-first), sem migrar o DNS do domínio pra Cloudflare. Snippet injetado em `src/app/layout.tsx` via `next/script` (`strategy="afterInteractive"`), token do beacon fixo no código (não é segredo — é só um identificador de site, o mesmo padrão do resto de config pública do Cloudflare). Dashboard: Cloudflare → Analytics → Web Analytics → artuzexpress.com.br. Métricas aparecem com alguns minutos de atraso depois do primeiro acesso real ao site em produção.
+
 ## Deploy
 
 ```bash
