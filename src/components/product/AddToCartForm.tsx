@@ -53,11 +53,25 @@ export function AddToCartForm({
 
   function handleAttributeChange(key: string, value: string) {
     const nextAttributes = { ...selectedAttributes, [key]: value };
-    setSelectedAttributes(nextAttributes);
-
     const nextCandidates = variants.filter((v) =>
       Object.entries(nextAttributes).every(([k, val]) => v.attributes[k] === val),
     );
+
+    if (nextCandidates.length === 0) {
+      // Nem todo produto tem combinação completa entre atributos (ex: nem
+      // todo tamanho de banner existe com todo tipo de bastão) — em vez de
+      // ficar sem variante nenhuma, mantém só o atributo que acabou de
+      // mudar e adota os demais valores de uma variante real que o tenha.
+      const fallback = variants.filter((v) => v.attributes[key] === value);
+      const cheapestFallback = [...fallback].sort((a, b) => a.quantity - b.quantity)[0];
+      if (cheapestFallback) {
+        setSelectedAttributes(pickConfigurableAttributes(cheapestFallback.attributes));
+        setSelectedVariantId(cheapestFallback.id);
+      }
+      return;
+    }
+
+    setSelectedAttributes(nextAttributes);
     const stillValid = nextCandidates.some((v) => v.id === selectedVariantId);
     if (!stillValid) {
       const cheapest = [...nextCandidates].sort((a, b) => a.quantity - b.quantity)[0];

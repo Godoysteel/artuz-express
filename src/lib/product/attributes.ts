@@ -43,6 +43,7 @@ export const ATTRIBUTE_KEY_ORDER = [
   "cor",
   "cobertura",
   "tamanho",
+  "bastao",
   "acabamento",
   "padrao",
 ];
@@ -54,6 +55,7 @@ export const ATTRIBUTE_LABELS: Record<string, string> = {
   cor: "Cor",
   cobertura: "Cobertura",
   tamanho: "Tamanho",
+  bastao: "Bastão",
   acabamento: "Acabamento Incluso",
   padrao: "Padrões",
 };
