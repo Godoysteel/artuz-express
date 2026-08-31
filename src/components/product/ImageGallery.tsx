@@ -23,7 +23,7 @@ export function ImageGallery({
             alt={active.alt ?? productName}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover"
+            className={active.url.startsWith("/produtos/carimbos/") ? "object-contain bg-[#ebebeb]" : "object-cover"}
             priority
           />
         ) : (
@@ -50,7 +50,7 @@ export function ImageGallery({
                 alt={image.alt ?? productName}
                 fill
                 sizes="120px"
-                className="object-cover"
+                className={image.url.startsWith("/produtos/carimbos/") ? "object-contain bg-[#ebebeb]" : "object-cover"}
               />
             </button>
           ))}

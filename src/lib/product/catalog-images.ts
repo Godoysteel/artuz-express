@@ -1,4 +1,6 @@
-// Imagens ilustrativas específicas; os demais produtos mantêm as imagens do banco.
+import { stampImages } from "./stamp-images";
+
+// Imagens específicas; os demais produtos mantêm as imagens do banco.
 const productImages: Record<string, string> = {
   "amostras-personalizadas-maximo-6-itens-aaf302b8": "amostras-personalizadas-v2",
   "copo-de-papel-biodegradavel-copa-do-mundo-440ml-sem-verniz-8-5x11cm-fbcf397f": "copo-papel-440ml-v2",
@@ -31,6 +33,8 @@ const membershipImages: Record<string, string> = {
 };
 
 export function getCatalogProductImage(slug: string): string | null {
+  const stamp = stampImages[slug];
+  if (stamp) return `/produtos/carimbos/${stamp}`;
   const membership = membershipImages[slug];
   if (membership) return `/produtos/carteirinhas-e-fidelidade/${membership}.png`;
   const booklet = bookletImages[slug];

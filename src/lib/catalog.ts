@@ -1,5 +1,6 @@
 import "server-only";
 import { getCatalogProductImage } from "@/lib/product/catalog-images";
+import { presentStampCategory } from "@/lib/product/stamp-category";
 import { createClient } from "@/lib/supabase/server";
 import type { AddonInfo, AttributeVariant } from "@/lib/product/attributes";
 
@@ -185,7 +186,8 @@ export async function getCategoryTiles(slug: string): Promise<CategoryTile[]> {
     sortOrder: family.sortOrder,
   }));
 
-  return [...productTiles, ...familyTiles].sort((a, b) => a.sortOrder - b.sortOrder).map((t) => t.tile);
+  const tiles = [...productTiles, ...familyTiles].sort((a, b) => a.sortOrder - b.sortOrder).map((t) => t.tile);
+  return slug === "carimbos" ? presentStampCategory(tiles) : tiles;
 }
 
 export async function getFamilyProducts(

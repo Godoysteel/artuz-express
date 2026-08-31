@@ -17,7 +17,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
             alt={product.name}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-cover transition duration-300 group-hover:scale-105"
+            className={`${product.imageUrl.startsWith("/produtos/carimbos/") ? "object-contain bg-[#ebebeb]" : "object-cover"} transition duration-300 group-hover:scale-105`}
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-50 text-brand/40">
