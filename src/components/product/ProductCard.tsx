@@ -1,14 +1,15 @@
 import Image from "next/image";
-import Link from "next/link";
 import { PackageOpen } from "lucide-react";
 import type { ProductCard as ProductCardType } from "@/lib/catalog";
 import { PriceFrom } from "@/components/ui/PriceFrom";
 import { shouldContainImage } from "@/lib/product/image-display";
+import { TrackedProductLink } from "@/components/analytics/TrackedProductLink";
 
 export function ProductCard({ product }: { product: ProductCardType }) {
   return (
-    <Link
+    <TrackedProductLink
       href={`/produto/${product.slug}`}
+      product={product}
       className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand/10"
     >
       <div className="relative aspect-square w-full overflow-hidden bg-slate-100">
@@ -32,6 +33,6 @@ export function ProductCard({ product }: { product: ProductCardType }) {
           <PriceFrom cents={product.minPriceCents} />
         </div>
       </div>
-    </Link>
+    </TrackedProductLink>
   );
 }

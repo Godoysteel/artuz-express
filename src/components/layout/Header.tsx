@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, User } from "lucide-react";
+import { BarChart3, ShoppingCart, User } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { getCartSummary } from "@/lib/cart/cart-service";
@@ -39,17 +39,22 @@ export async function Header() {
 
         <div className="ml-auto flex items-center gap-4">
           {admin && (
-            <Link
-              href="/admin/pedidos"
-              className="relative hidden items-center gap-1.5 text-sm text-slate-200 transition hover:text-white sm:flex"
-            >
-              Admin
-              {pendingOrdersCount > 0 && (
-                <span className="absolute -right-3 -top-2 flex size-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-bold text-white">
-                  {pendingOrdersCount}
-                </span>
-              )}
-            </Link>
+            <div className="hidden items-center gap-3 sm:flex">
+              <Link href="/admin/estatisticas" title="Estatísticas" className="text-slate-200 transition hover:text-white">
+                <BarChart3 className="size-5" />
+              </Link>
+              <Link
+                href="/admin/pedidos"
+                className="relative text-sm text-slate-200 transition hover:text-white"
+              >
+                Pedidos
+                {pendingOrdersCount > 0 && (
+                  <span className="absolute -right-3 -top-2 flex size-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-bold text-white">
+                    {pendingOrdersCount}
+                  </span>
+                )}
+              </Link>
+            </div>
           )}
           <Link
             href="/conta"

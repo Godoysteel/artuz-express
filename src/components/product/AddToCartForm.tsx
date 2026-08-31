@@ -17,12 +17,15 @@ import { QuantityTierList } from "@/components/product/QuantityTierList";
 import { AddonChecklist } from "@/components/product/AddonChecklist";
 import { ArtworkUpload } from "@/components/product/ArtworkUpload";
 import { DESIGN_SERVICE_LABEL } from "@/lib/product/design-service";
+import { trackEvent } from "@/lib/analytics/client";
 
 export function AddToCartForm({
+  product,
   variants,
   addons,
   requiresArtwork = true,
 }: {
+  product: { id: string; slug: string; name: string };
   variants: AttributeVariant[];
   addons: AddonInfo[];
   requiresArtwork?: boolean;
@@ -116,6 +119,13 @@ export function AddToCartForm({
         !hasDesignService && artworkFileName ? artworkToken : undefined,
       );
       setAdded(true);
+      trackEvent({
+          eventType: "add_to_cart",
+          productId: product.id,
+          productSlug: product.slug,
+          productName: product.name,
+          metadata: { quantity: qty, variantId: selected.id },
+        });
       setArtworkFileName(null);
       setArtworkToken(crypto.randomUUID());
       router.refresh();

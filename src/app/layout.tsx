@@ -8,6 +8,7 @@ import { CookieNotice } from "@/components/layout/CookieNotice";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { CONTACT_EMAIL } from "@/lib/contact";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1">{children}</main>
         <Footer />
         <WhatsAppButton />
+        <PageViewTracker />
         <CookieNotice />
         <Script
           type="module"

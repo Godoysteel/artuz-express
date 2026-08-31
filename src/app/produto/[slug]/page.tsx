@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
 import { CategoryProductJump } from "@/components/product/CategoryProductJump";
+import { ProductViewTracker } from "@/components/analytics/ProductViewTracker";
 import { ImageGallery } from "@/components/product/ImageGallery";
 import {
   getCategoriesWithStartingPrice,
@@ -95,6 +96,7 @@ export default async function ProductPage({
 
   return (
     <>
+      <ProductViewTracker product={{ id: product.id, slug: product.slug, name: product.name }} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -136,6 +138,7 @@ export default async function ProductPage({
 
           <div className="mt-6 border-t border-slate-200 pt-6">
             <AddToCartForm
+              product={{ id: product.id, slug: product.slug, name: product.name }}
               variants={product.variants}
               addons={product.addons}
               requiresArtwork={categoryRequiresArtwork(product.category.slug)}
