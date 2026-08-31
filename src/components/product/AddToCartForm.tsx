@@ -21,9 +21,11 @@ import { DESIGN_SERVICE_LABEL } from "@/lib/product/design-service";
 export function AddToCartForm({
   variants,
   addons,
+  requiresArtwork = true,
 }: {
   variants: AttributeVariant[];
   addons: AddonInfo[];
+  requiresArtwork?: boolean;
 }) {
   const router = useRouter();
   const attributeOptions = useMemo(() => deriveAttributeOptions(variants), [variants]);
@@ -101,7 +103,7 @@ export function AddToCartForm({
 
   const designServiceAddon = addons.find((a) => a.label === DESIGN_SERVICE_LABEL);
   const hasDesignService = !!designServiceAddon && selectedAddonIds.has(designServiceAddon.id);
-  const hasArtwork = hasDesignService || !!artworkFileName;
+  const hasArtwork = !requiresArtwork || hasDesignService || !!artworkFileName;
 
   function handleAdd() {
     if (!selected || !hasArtwork) return;
@@ -147,12 +149,14 @@ export function AddToCartForm({
         selectedIds={selectedAddonIds}
         onToggle={toggleAddon}
       />
-      <ArtworkUpload
-        token={artworkToken}
-        disabled={hasDesignService}
-        fileName={artworkFileName}
-        onFileChange={setArtworkFileName}
-      />
+      {requiresArtwork && (
+        <ArtworkUpload
+          token={artworkToken}
+          disabled={hasDesignService}
+          fileName={artworkFileName}
+          onFileChange={setArtworkFileName}
+        />
+      )}
 
       <AddonChecklist
         title="Serviços Opcionais"

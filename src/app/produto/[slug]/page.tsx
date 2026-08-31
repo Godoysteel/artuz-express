@@ -10,6 +10,7 @@ import {
   getProductBySlug,
   getProductsByCategorySlug,
 } from "@/lib/catalog";
+import { categoryRequiresArtwork } from "@/lib/product/artwork";
 import { formatCents } from "@/lib/format";
 
 export async function generateMetadata({
@@ -134,7 +135,11 @@ export default async function ProductPage({
           </div>
 
           <div className="mt-6 border-t border-slate-200 pt-6">
-            <AddToCartForm variants={product.variants} addons={product.addons} />
+            <AddToCartForm
+              variants={product.variants}
+              addons={product.addons}
+              requiresArtwork={categoryRequiresArtwork(product.category.slug)}
+            />
           </div>
         </div>
       </div>
