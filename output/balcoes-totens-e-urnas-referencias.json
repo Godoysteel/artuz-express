@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Pequeno Personalizado L 48 x P 30 x A 90cm",
+    "source": "https://www.atualcard.com.br/balcao-promocional-pequeno-personalizado-48x30x90cm/9730/9733/9742/pequeno-personalizado-l-48-x-p-30-x-a-90cm-mdf---ps-4x0-sem-verniz-48x30x90cm-1-478375",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/balcao-promocional-pequeno--t1.png",
+    "file": "tmp/balcoes/balcao-promocional-pequeno--t1.png"
+  },
+  {
+    "title": "Grande Personalizado L 84 x P 40 x A 90cm",
+    "source": "https://www.atualcard.com.br/grande-personalizado-l-84-x-p-40-x-a-90cm/9730/9733/9745/grande-personalizado-l-84-x-p-40-x-a-90cm-mdf---ps-4x0-sem-verniz-84x40x90cm-1-478372",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/balcao-promocional-grande---t1.png",
+    "file": "tmp/balcoes/balcao-promocional-grande---t1.png"
+  },
+  {
+    "title": "Pequeno Sem Impressão L 48 x P 30 x A 90cm",
+    "source": "https://www.atualcard.com.br/balcao-promocional-grande-personalizado-84x40x90cm/9730/9733/9748/balcao-promocional-mdf---ps-sem-impressao-sem-acabamento-48x30x90cm-1-478378",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/balcao-promocional-pequeno-sem-impressao--t1.png",
+    "file": "tmp/balcoes/balcao-promocional-pequeno-sem-impressao--t1.png"
+  },
+  {
+    "title": "Grande Sem Impressão L 84 x P 40 x A 90cm",
+    "source": "https://www.atualcard.com.br/balcao-promocional-grande-84X40x90cm/9730/9733/9751/grande-sem-impressao-l-84-x-p-40-x-a-90cm-mdf---ps-sem-impressao-sem-acabamento-84x40x90cm-1-478381",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/balcao-promocional-grande-sem-impressao--t1.png",
+    "file": "tmp/balcoes/balcao-promocional-grande-sem-impressao--t1.png"
+  },
+  {
+    "title": "Mini Totem",
+    "source": "https://www.atualcard.com.br/mini-totem/9730/9739/9754/totens-pvc-200g-4x0-sem-verniz-16x29-5cm-1-482572",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/thumb-mini-totem-t1.png",
+    "file": "tmp/balcoes/thumb-mini-totem-t1.png"
+  },
+  {
+    "title": "Totem Dobrável Elíptico",
+    "source": "https://www.atualcard.com.br/totem-dobravel-eliptico/9730/9739/9757/totem-dobravel-eliptico-pvc-200g-4x0-sem-verniz-50x148cm-1-482569",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/1totem_dobravel--t1.png",
+    "file": "tmp/balcoes/1totem_dobravel--t1.png"
+  },
+  {
+    "title": "Totem Silhueta",
+    "source": "https://www.atualcard.com.br/totem-silhueta/9730/9739/9760/totem-silhueta-polionda-4mm-4x0-sem-verniz-por-m2-1-478099",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/thumb-totem-silhueta--categoria--t1.png",
+    "file": "tmp/balcoes/thumb-totem-silhueta--categoria--t1.png"
+  },
+  {
+    "title": "Balcão Promocional",
+    "source": "https://www.atualcard.com.br/balcao-promocional/9733",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/balcao-promocional-categoria-0-t1.png",
+    "file": "tmp/balcoes/balcao-promocional-categoria-0-t1.png"
+  },
+  {
+    "title": "Totens",
+    "source": "https://www.atualcard.com.br/totens/9739",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/1totem_dobravel--t1.png",
+    "file": "tmp/balcoes/1totem_dobravel--t1.png"
+  },
+  {
+    "title": "Urnas",
+    "source": "https://www.atualcard.com.br/urnas/9730/9736/urna-para-sorteio-polionda-2mm-4x0-sem-verniz-20x20cm-4-481351",
+    "img": "https://cdn.atualcard.com.br/arquivos/menu/normais/thumb-urna-para-sorteio--t1.png",
+    "file": "tmp/balcoes/thumb-urna-para-sorteio--t1.png"
+  }
+]

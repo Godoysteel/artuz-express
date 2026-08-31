@@ -32,7 +32,20 @@ const membershipImages: Record<string, string> = {
   "carteirinha-supremo-300g-sem-verniz-10x15cm-19035935": "carteirinha-papel-v2",
 };
 
+const displayImages: Record<string, string> = {
+  "balcao-promocional-em-mdf-grande-l-84cm-x-p-40cm-x-a-90cm-168f7157": "balcao-grande-personalizado-v2",
+  "balcao-promocional-em-mdf-grande-sem-impressao-l-84cm-x-p-40cm-x-a-90cm-74cea10d": "balcao-grande-sem-impressao-v2",
+  "balcao-promocional-em-mdf-pequeno-l-48cm-x-p-30cm-x-a-90cm-da30ca69": "balcao-pequeno-personalizado-v2",
+  "balcao-promocional-em-mdf-pequeno-sem-impressao-l-48cm-x-p-30cm-x-a-90cm-7ba57221": "balcao-pequeno-sem-impressao-v2",
+  "mini-totem-eliptico-16x31-5cm-98007420": "mini-totem-eliptico-v2",
+  "totem-dobravel-eliptico-50x148cm-c8abd448": "totem-dobravel-eliptico-v2",
+  "totem-silhueta-personalizada-em-polionda-4mm-por-m-38444eb5": "totem-silhueta-v2",
+  "urna-em-polionda-2mm-20x20-cm-9fb7feca": "urna-polionda-v2",
+};
+
 export function getCatalogProductImage(slug: string): string | null {
+  const display = displayImages[slug];
+  if (display) return `/produtos/balcoes-totens-e-urnas/${display}.png`;
   const stamp = stampImages[slug];
   if (stamp) return `/produtos/carimbos/${stamp}`;
   const membership = membershipImages[slug];
