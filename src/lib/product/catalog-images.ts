@@ -23,7 +23,16 @@ const bookletImages: Record<string, string> = {
   "plano-de-governo-couche-120g-sem-verniz-21x30cm-4-paginas-799d6c9c": "plano-governo-v2",
 };
 
+const membershipImages: Record<string, string> = {
+  "cartao-fidelidade-com-arte-unica-em-pvc-0-5mm-cristal-frente-e-verso-8-5x5-4cm-5368e010": "fidelidade-arte-unica-v2",
+  "cartao-fidelidade-com-tarja-magnetica-em-pvc-0-76mm-cristal-frente-e-verso-8-5x5-b136710e": "fidelidade-tarja-v2",
+  "carteirinha-arte-unica-em-pvc-0-5mm-cristal-frente-e-verso-8-5x5-4cm-be5f9af0": "carteirinha-arte-unica-v2",
+  "carteirinha-supremo-300g-sem-verniz-10x15cm-19035935": "carteirinha-papel-v2",
+};
+
 export function getCatalogProductImage(slug: string): string | null {
+  const membership = membershipImages[slug];
+  if (membership) return `/produtos/carteirinhas-e-fidelidade/${membership}.png`;
   const booklet = bookletImages[slug];
   if (booklet) return `/produtos/catalogos-e-livretos/${booklet}.png`;
   const decoration = decorationImages[slug];
