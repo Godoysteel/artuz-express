@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { ProductCard } from "@/components/product/ProductCard";
-import { getCategoryBySlug, getProductsByCategorySlug } from "@/lib/catalog";
+import { FamilyCard } from "@/components/product/FamilyCard";
+import { getCategoryBySlug, getCategoryTiles } from "@/lib/catalog";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://artuzexpress.com.br";
 
@@ -37,7 +38,7 @@ export default async function CategoryPage({
   const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
-  const products = await getProductsByCategorySlug(slug);
+  const tiles = await getCategoryTiles(slug);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -72,13 +73,17 @@ export default async function CategoryPage({
         <p className="mt-1 max-w-2xl text-sm text-slate-500">{category.description}</p>
       )}
 
-      {products.length === 0 ? (
+      {tiles.length === 0 ? (
         <p className="mt-10 text-slate-500">Nenhum produto encontrado nesta categoria.</p>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {tiles.map((tile) =>
+            tile.kind === "product" ? (
+              <ProductCard key={tile.product.id} product={tile.product} />
+            ) : (
+              <FamilyCard key={tile.family.slug} categorySlug={category.slug} family={tile.family} />
+            ),
+          )}
         </div>
       )}
     </Container>

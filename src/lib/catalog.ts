@@ -104,6 +104,131 @@ export async function getProductsByCategorySlug(slug: string): Promise<ProductCa
   });
 }
 
+export type FamilyCard = {
+  slug: string;
+  name: string;
+  imageUrl: string | null;
+  minPriceCents: number | null;
+};
+
+export type CategoryTile =
+  | { kind: "product"; product: ProductCard }
+  | { kind: "family"; family: FamilyCard };
+
+/**
+ * Alguns fornecedores agrupam vários produtos distintos (ex: modelos de
+ * carimbo) sob uma "família" antes de chegar no produto de verdade — pra
+ * bater visualmente com isso sem introduzir uma tabela de categorias
+ * aninhada, `products.family_slug`/`family_name` agrupa vários produtos
+ * num card só na grade da categoria, que leva pra uma sub-página
+ * (`/categorias/[slug]/[family]`) listando os produtos daquela família.
+ * Produtos sem família aparecem direto como sempre.
+ */
+export async function getCategoryTiles(slug: string): Promise<CategoryTile[]> {
+  const supabase = await createClient();
+  const { data: products, error } = await supabase
+    .from("products")
+    .select(
+      `id, slug, name, sort_order, family_slug, family_name,
+       categories!inner ( slug ),
+       product_images ( url, sort_order )`,
+    )
+    .eq("is_active", true)
+    .eq("categories.slug", slug)
+    .order("sort_order", { ascending: true });
+
+  if (error || !products) return [];
+
+  const { data: prices } = await supabase
+    .from("product_starting_prices")
+    .select("product_id, min_price_cents")
+    .in("product_id", products.map((p) => p.id));
+
+  const priceByProduct = new Map((prices ?? []).map((p) => [p.product_id, p.min_price_cents]));
+
+  const familyByslug = new Map<
+    string,
+    { name: string; sortOrder: number; imageUrl: string | null; minPriceCents: number | null }
+  >();
+  const productTiles: { tile: CategoryTile; sortOrder: number }[] = [];
+
+  for (const p of products) {
+    const images = [...(p.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+    const imageUrl = getCatalogProductImage(p.slug) ?? images[0]?.url ?? null;
+    const minPriceCents = priceByProduct.get(p.id) ?? null;
+
+    if (!p.family_slug || !p.family_name) {
+      productTiles.push({
+        tile: { kind: "product", product: { id: p.id, slug: p.slug, name: p.name, imageUrl, minPriceCents } },
+        sortOrder: p.sort_order,
+      });
+      continue;
+    }
+
+    const existing = familyByslug.get(p.family_slug);
+    if (!existing) {
+      familyByslug.set(p.family_slug, { name: p.family_name, sortOrder: p.sort_order, imageUrl, minPriceCents });
+    } else {
+      existing.imageUrl ??= imageUrl;
+      if (minPriceCents !== null && (existing.minPriceCents === null || minPriceCents < existing.minPriceCents)) {
+        existing.minPriceCents = minPriceCents;
+      }
+      existing.sortOrder = Math.min(existing.sortOrder, p.sort_order);
+    }
+  }
+
+  const familyTiles = [...familyByslug].map(([familySlug, family]) => ({
+    tile: {
+      kind: "family" as const,
+      family: { slug: familySlug, name: family.name, imageUrl: family.imageUrl, minPriceCents: family.minPriceCents },
+    },
+    sortOrder: family.sortOrder,
+  }));
+
+  return [...productTiles, ...familyTiles].sort((a, b) => a.sortOrder - b.sortOrder).map((t) => t.tile);
+}
+
+export async function getFamilyProducts(
+  categorySlug: string,
+  familySlug: string,
+): Promise<{ familyName: string; products: ProductCard[] } | null> {
+  const supabase = await createClient();
+  const { data: products, error } = await supabase
+    .from("products")
+    .select(
+      `id, slug, name, sort_order, family_name,
+       categories!inner ( slug ),
+       product_images ( url, sort_order )`,
+    )
+    .eq("is_active", true)
+    .eq("categories.slug", categorySlug)
+    .eq("family_slug", familySlug)
+    .order("sort_order", { ascending: true });
+
+  if (error || !products || products.length === 0) return null;
+
+  const { data: prices } = await supabase
+    .from("product_starting_prices")
+    .select("product_id, min_price_cents")
+    .in("product_id", products.map((p) => p.id));
+
+  const priceByProduct = new Map((prices ?? []).map((p) => [p.product_id, p.min_price_cents]));
+
+  return {
+    familyName: products[0].family_name!,
+    products: products.map((p) => {
+      const images = [...(p.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+      return {
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        imageUrl: getCatalogProductImage(p.slug) ?? images[0]?.url ?? null,
+        minPriceCents: priceByProduct.get(p.id) ?? null,
+      };
+    }),
+  };
+}
+
 export type ProductDetail = {
   id: string;
   slug: string;
