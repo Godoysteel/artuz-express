@@ -49,6 +49,7 @@ export const ATTRIBUTE_KEY_ORDER = [
   "corte",
   "embalagem",
   "tema",
+  "paginas",
 ];
 
 const CONFIGURABLE_ATTRIBUTE_KEYS = new Set(ATTRIBUTE_KEY_ORDER);
@@ -64,6 +65,7 @@ export const ATTRIBUTE_LABELS: Record<string, string> = {
   corte: "Corte",
   embalagem: "Embalagem",
   tema: "Tema",
+  paginas: "Páginas",
 };
 
 function attributeLabel(key: string): string {
