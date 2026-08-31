@@ -54,8 +54,8 @@ const localBusinessJsonLd = {
   url: siteUrl,
   telephone: `+${WHATSAPP_NUMBER}`,
   email: CONTACT_EMAIL,
-  // Área de atendimento, não loja física — mesma configuração do Google Business Profile.
-  areaServed: { "@type": "City", name: "Joinville" },
+  // Área de atendimento, não loja física — empresa 100% online, entrega em todo o Brasil.
+  areaServed: { "@type": "Country", name: "Brasil" },
   priceRange: "$$",
 };
 
