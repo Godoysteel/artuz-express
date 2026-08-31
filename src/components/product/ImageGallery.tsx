@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { PackageOpen } from "lucide-react";
+import { shouldContainImage } from "@/lib/product/image-display";
 
 export function ImageGallery({
   images,
@@ -23,7 +24,7 @@ export function ImageGallery({
             alt={active.alt ?? productName}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className={active.url.startsWith("/produtos/carimbos/") ? "object-contain bg-[#ebebeb]" : "object-cover"}
+            className={shouldContainImage(active.url) ? "object-contain bg-[#ebebeb]" : "object-cover"}
             priority
           />
         ) : (
@@ -50,7 +51,7 @@ export function ImageGallery({
                 alt={image.alt ?? productName}
                 fill
                 sizes="120px"
-                className={image.url.startsWith("/produtos/carimbos/") ? "object-contain bg-[#ebebeb]" : "object-cover"}
+                className={shouldContainImage(image.url) ? "object-contain bg-[#ebebeb]" : "object-cover"}
               />
             </button>
           ))}
