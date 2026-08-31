@@ -16,7 +16,16 @@ const decorationImages: Record<string, string> = {
   "quadro-decorativo-em-mdf-3mm-adesivado-com-laminacao-fosca-20x30cm-d31b684a": "quadro-mdf-sem-moldura-v2",
 };
 
+const bookletImages: Record<string, string> = {
+  "livretos-8b6b1dfd": "livretos-v2",
+  "manuais-097ccd60": "manuais-v2",
+  "manuais-e-catalogos-couche-120g-sem-verniz-15x20cm-8-paginas-2ccb0f3f": "catalogos-v2",
+  "plano-de-governo-couche-120g-sem-verniz-21x30cm-4-paginas-799d6c9c": "plano-governo-v2",
+};
+
 export function getCatalogProductImage(slug: string): string | null {
+  const booklet = bookletImages[slug];
+  if (booklet) return `/produtos/catalogos-e-livretos/${booklet}.png`;
   const decoration = decorationImages[slug];
   if (decoration) return `/produtos/quadros-e-decoracoes/${decoration}.png`;
   const image = productImages[slug];
