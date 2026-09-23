@@ -130,10 +130,11 @@ export default function BarnConfigurator() {
 
         {step === 3 && (
           <div className="flex flex-col gap-3">
-            <Counter title="Janelas" value={c.windows} onChange={(v) => set({ windows: v })} />
-            <Counter title="Portas" value={c.doors} onChange={(v) => set({ doors: v })} />
+            {isOpen && <p className="text-sm text-slate-600">O galpão aberto é aberto por todos os lados: não tem paredes, portas, janelas nem portões.</p>}
             {!isOpen && (
               <>
+                <Counter title="Janelas" value={c.windows} onChange={(v) => set({ windows: v })} />
+                <Counter title="Portas" value={c.doors} onChange={(v) => set({ doors: v })} />
                 <Counter title="Portões" value={c.gates} onChange={(v) => set({ gates: v })} />
                 <label className={label}>Tipo de portão
                   <select className={field} value={c.gateType} onChange={(e) => set({ gateType: e.target.value as BarnGateType })}>

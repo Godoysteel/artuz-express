@@ -63,8 +63,8 @@ export const BARN_LIMITS = {
 
 export const BARN_MODELS: { id: BarnModel; label: string; description: string }[] = [
   { id: 'fechado', label: 'Galpão Fechado', description: 'Fechado nas laterais e no fundo, com portão e porta de acesso.' },
-  { id: 'aberto', label: 'Galpão Aberto', description: 'Estrutura aberta na frente, ideal para veículos, máquinas e feno.' },
-  { id: 'celeiro', label: 'Celeiro', description: 'Telhado inclinado, portão em X e silo opcional. Estilo americano.' },
+  { id: 'aberto', label: 'Galpão Aberto', description: 'Aberto por todos os lados: só colunas e cobertura, ideal para veículos, máquinas e feno.' },
+  { id: 'celeiro', label: 'Celeiro', description: 'Nave central elevada com janelas, telhado verde, portão em X, cúpula e silo opcional. Estilo americano.' },
 ];
 
 export const BARN_ROOFS: { id: BarnRoof; label: string }[] = [
@@ -129,8 +129,10 @@ export function normalizeBarnConfig(config: BarnConfig): BarnConfig {
   const gates = config.model === 'aberto' ? 0 : Math.min(maxGates, Math.round(clamp(config.gates, L.openings.min, L.openings.max)));
   // Portas + janelas nas duas laterais, com pelo menos ~2,4 m por vão.
   const maxSide = 2 * Math.floor(lengthM / 2.4);
-  const doors = Math.min(maxSide, Math.round(clamp(config.doors, L.openings.min, L.openings.max)));
-  const windows = Math.min(maxSide - doors, Math.round(clamp(config.windows, L.openings.min, L.openings.max)));
+  // Galpão aberto não tem paredes, então não há portas, janelas nem portões.
+  const isOpen = config.model === 'aberto';
+  const doors = isOpen ? 0 : Math.min(maxSide, Math.round(clamp(config.doors, L.openings.min, L.openings.max)));
+  const windows = isOpen ? 0 : Math.min(maxSide - doors, Math.round(clamp(config.windows, L.openings.min, L.openings.max)));
   return {
     ...config, widthM, lengthM, eaveHeightM, gateWidthM, gateHeightM, gates, doors, windows,
     // Silo só existe no Celeiro; ACM só faz sentido com parede frontal (não no aberto).

@@ -9,14 +9,14 @@ export const GALPAO_MODELS = [
   {
     id: "aberto",
     name: "Galpão aberto",
-    description: "Estrutura aberta na frente, ideal para abrigar veículos, máquinas e feno.",
+    description: "Aberto por todos os lados: só colunas e cobertura, ideal para abrigar veículos, máquinas e feno.",
     image: "/galpoes/aberto.jpg",
     closing: "Aberto",
   },
   {
     id: "celeiro",
     name: "Celeiro",
-    description: "Telhado quebrado, portão em X e opção de silo. Pode ter revestimento em ACM.",
+    description: "Nave central elevada com janelas, telhado verde, portão em X, cúpula e opção de silo. Pode ter revestimento em ACM.",
     image: "/galpoes/celeiro.jpg",
     closing: "Fechado",
   },
