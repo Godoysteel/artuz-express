@@ -89,6 +89,9 @@ export async function Header() {
               {category.name}
             </Link>
           ))}
+          <Link href="/galpoes" className="shrink-0 font-semibold text-white transition hover:text-accent">
+            Galpões
+          </Link>
         </Container>
       </div>
 
