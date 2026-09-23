@@ -17,7 +17,6 @@ const WORKS = [
   { src: "/galpoes/obra-planta.jpg", alt: "Vista aérea da estrutura metálica sobre a laje", caption: "Vista aérea da estrutura", pos: "50% 45%" },
   { src: "/galpoes/obra-janelas.jpg", alt: "Parede revestida com janela de correr e persiana", caption: "Janelas com persiana", pos: "50% 50%" },
   { src: "/galpoes/obra-janela-detalhe.jpg", alt: "Detalhe do acabamento das janelas na parede", caption: "Acabamento das aberturas", pos: "50% 50%" },
-  { src: "/galpoes/acm-painel.jpg", alt: "Detalhe de painéis de revestimento em ACM", caption: "Revestimento em ACM", pos: "50% 50%" },
 ];
 
 const STEPS = [
@@ -94,7 +93,7 @@ export default function GalpoesPage() {
         <Container className="py-12">
           <h2 className="text-2xl font-bold text-ink">Estrutura e acabamento</h2>
           <p className="mt-2 max-w-2xl text-slate-600">
-            Da estrutura metálica ao fechamento das paredes e da cobertura. Nos celeiros, também trabalhamos com revestimento em ACM.
+            Da estrutura metálica ao fechamento das paredes e da cobertura.
           </p>
           <figure className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
             <Image src="/galpoes/galpao-vermelho.jpg" alt="Galpão fechado com cobertura e paredes em chapa vermelha e acabamento branco" width={1400} height={933} sizes="(min-width: 1280px) 1216px, 100vw" className="aspect-[16/9] w-full object-cover" />

@@ -16,7 +16,7 @@ export const GALPAO_MODELS = [
   {
     id: "celeiro",
     name: "Celeiro",
-    description: "Nave central elevada com janelas, telhado verde, portão em X, cúpula e opção de silo.",
+    description: "Nave central elevada com janelas, telhado verde, portão em X e cúpula.",
     image: "/galpoes/celeiro.jpg",
     closing: "Fechado",
   },

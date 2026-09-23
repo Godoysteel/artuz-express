@@ -106,7 +106,6 @@ export default function BarnConfigurator() {
                 ))}
               </div>
             </div>
-            {c.model === "celeiro" && <label className="flex items-center gap-2 text-sm font-medium text-ink"><input type="checkbox" checked={c.silo} onChange={(e) => set({ silo: e.target.checked })} /> Incluir silo decorativo</label>}
           </div>
         )}
 
