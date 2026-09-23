@@ -18,6 +18,12 @@ const STEPS = [
   { title: "Montagem", text: "Nossa equipe monta o galpão no seu terreno." },
 ];
 
+const DETAILS = [
+  { src: "/galpoes/estrutura.jpg", alt: "Estrutura metálica de um galpão em montagem", caption: "Estrutura metálica", w: 1200, h: 799 },
+  { src: "/galpoes/projeto.jpg", alt: "Desenho da estrutura de um galpão", caption: "Projeto da estrutura", w: 1200, h: 800 },
+  { src: "/galpoes/acabamento.jpg", alt: "Detalhe do fechamento e da cobertura em chapa vermelha com acabamento branco", caption: "Fechamento e cobertura", w: 1200, h: 800 },
+];
+
 export default function GalpoesPage() {
   return (
     <>
@@ -60,6 +66,23 @@ export default function GalpoesPage() {
           ))}
         </div>
       </Container>
+
+      <section className="border-t border-slate-200 bg-white">
+        <Container className="py-12">
+          <h2 className="text-2xl font-bold text-ink">Estrutura e acabamento</h2>
+          <p className="mt-2 max-w-2xl text-slate-600">
+            Da estrutura metálica ao fechamento das paredes e da cobertura. Nos celeiros, também trabalhamos com revestimento em ACM.
+          </p>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {DETAILS.map((d) => (
+              <figure key={d.src} className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                <Image src={d.src} alt={d.alt} width={d.w} height={d.h} sizes="(min-width: 768px) 33vw, 100vw" className="aspect-[4/3] w-full object-cover" />
+                <figcaption className="p-3 text-sm font-semibold text-ink">{d.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </Container>
+      </section>
 
       <section className="border-y border-slate-200 bg-white">
         <Container className="py-12">
