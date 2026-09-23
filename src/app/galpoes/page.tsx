@@ -11,6 +11,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/galpoes" },
 };
 
+const WORKS = [
+  { src: "/galpoes/obra-drone.jpg", alt: "Estrutura metálica montada sobre a laje, vista de cima e de lado", caption: "Estrutura montada", pos: "50% 65%" },
+  { src: "/galpoes/obra-montagem.jpg", alt: "Equipe montando a estrutura metálica no terreno", caption: "Equipe em montagem", pos: "50% 50%" },
+  { src: "/galpoes/obra-planta.jpg", alt: "Vista aérea da estrutura metálica sobre a laje", caption: "Vista aérea da estrutura", pos: "50% 45%" },
+  { src: "/galpoes/obra-janelas.jpg", alt: "Parede revestida com janela de correr e persiana", caption: "Janelas com persiana", pos: "50% 50%" },
+  { src: "/galpoes/obra-janela-detalhe.jpg", alt: "Detalhe do acabamento das janelas na parede", caption: "Acabamento das aberturas", pos: "50% 50%" },
+  { src: "/galpoes/acm-painel.jpg", alt: "Detalhe de painéis de revestimento em ACM", caption: "Revestimento em ACM", pos: "50% 50%" },
+];
+
 const STEPS = [
   { title: "Você monta o pedido", text: "Escolhe o modelo, as medidas, o fechamento e as aberturas no formulário abaixo." },
   { title: "Enviamos o orçamento", text: "Recebemos seu pedido pelo WhatsApp e retornamos com valores e prazo." },
@@ -85,6 +94,21 @@ export default function GalpoesPage() {
               <figure key={d.src} className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                 <Image src={d.src} alt={d.alt} width={1200} height={800} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="aspect-[4/3] w-full object-cover" />
                 <figcaption className="p-3 text-sm font-semibold text-ink">{d.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="border-t border-slate-200">
+        <Container className="py-12">
+          <h2 className="text-2xl font-bold text-ink">Nossas obras</h2>
+          <p className="mt-2 max-w-2xl text-slate-600">Registros de montagens e acabamentos feitos pela nossa equipe.</p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {WORKS.map((w) => (
+              <figure key={w.src} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <Image src={w.src} alt={w.alt} width={960} height={720} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" style={{ objectPosition: w.pos }} className="aspect-[4/3] w-full object-cover" />
+                <figcaption className="p-3 text-sm font-semibold text-ink">{w.caption}</figcaption>
               </figure>
             ))}
           </div>
