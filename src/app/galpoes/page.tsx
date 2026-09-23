@@ -40,20 +40,31 @@ export default function GalpoesPage() {
   return (
     <>
       <section className="bg-ink-soft text-white">
-        <Container className="py-12 sm:py-16">
-          <p className="text-sm font-semibold uppercase tracking-wider text-brand-light">Galpões e celeiros</p>
-          <h1 className="mt-2 max-w-2xl text-balance text-3xl font-bold sm:text-5xl">
-            Monte o seu galpão do jeito que você precisa
-          </h1>
-          <p className="mt-4 max-w-xl text-slate-200">
-            Escolha o modelo, informe as medidas e receba o orçamento pelo WhatsApp.
-          </p>
-          <a
-            href="#orcamento"
-            className="mt-6 inline-flex min-h-12 items-center rounded-lg bg-accent px-6 font-bold text-white transition hover:bg-accent-dark"
-          >
-            Pedir orçamento
-          </a>
+        <Container className="flex flex-col-reverse items-start gap-8 py-12 sm:py-16 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-brand-light">Galpões e celeiros</p>
+            <h1 className="mt-2 max-w-2xl text-balance text-3xl font-bold sm:text-5xl">
+              Monte o seu galpão do jeito que você precisa
+            </h1>
+            <p className="mt-4 max-w-xl text-slate-200">
+              Escolha o modelo, informe as medidas e receba o orçamento pelo WhatsApp.
+            </p>
+            <a
+              href="#orcamento"
+              className="mt-6 inline-flex min-h-12 items-center rounded-lg bg-accent px-6 font-bold text-white transition hover:bg-accent-dark"
+            >
+              Pedir orçamento
+            </a>
+          </div>
+          <Image
+            src="/galpoes/logo-godoy.png"
+            alt="Godoy Construtor, Steel Frame, Joinville/SC, desde 2007"
+            width={600}
+            height={600}
+            sizes="(min-width: 768px) 224px, 176px"
+            priority
+            className="size-36 shrink-0 rounded-full shadow-lg shadow-black/30 sm:size-44 md:size-56"
+          />
         </Container>
       </section>
 
