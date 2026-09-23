@@ -19,9 +19,12 @@ const STEPS = [
 ];
 
 const DETAILS = [
-  { src: "/galpoes/estrutura.jpg", alt: "Estrutura metálica de um galpão em montagem", caption: "Estrutura metálica", w: 1200, h: 799 },
-  { src: "/galpoes/projeto.jpg", alt: "Desenho da estrutura de um galpão", caption: "Projeto da estrutura", w: 1200, h: 800 },
-  { src: "/galpoes/acabamento.jpg", alt: "Detalhe do fechamento e da cobertura em chapa vermelha com acabamento branco", caption: "Fechamento e cobertura", w: 1200, h: 800 },
+  { src: "/galpoes/estrutura-laje.jpg", alt: "Estrutura metálica de um galpão sobre a laje de concreto", caption: "Estrutura sobre laje" },
+  { src: "/galpoes/estrutura-tesouras.jpg", alt: "Tesouras e pilares da estrutura metálica", caption: "Tesouras e pilares" },
+  { src: "/galpoes/estrutura.jpg", alt: "Estrutura metálica de um galpão em montagem", caption: "Estrutura em montagem" },
+  { src: "/galpoes/interior.jpg", alt: "Interior amplo de um galpão, sem pilares no meio do vão", caption: "Vão livre por dentro" },
+  { src: "/galpoes/projeto.jpg", alt: "Desenho da estrutura de um galpão", caption: "Projeto da estrutura" },
+  { src: "/galpoes/acabamento.jpg", alt: "Detalhe do fechamento e da cobertura em chapa vermelha com acabamento branco", caption: "Fechamento e cobertura" },
 ];
 
 export default function GalpoesPage() {
@@ -73,10 +76,14 @@ export default function GalpoesPage() {
           <p className="mt-2 max-w-2xl text-slate-600">
             Da estrutura metálica ao fechamento das paredes e da cobertura. Nos celeiros, também trabalhamos com revestimento em ACM.
           </p>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <figure className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+            <Image src="/galpoes/galpao-vermelho.jpg" alt="Galpão fechado com cobertura e paredes em chapa vermelha e acabamento branco" width={1400} height={933} sizes="(min-width: 1280px) 1216px, 100vw" className="aspect-[16/9] w-full object-cover" />
+            <figcaption className="p-3 text-sm font-semibold text-ink">Galpão fechado, pronto</figcaption>
+          </figure>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {DETAILS.map((d) => (
               <figure key={d.src} className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                <Image src={d.src} alt={d.alt} width={d.w} height={d.h} sizes="(min-width: 768px) 33vw, 100vw" className="aspect-[4/3] w-full object-cover" />
+                <Image src={d.src} alt={d.alt} width={1200} height={800} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="aspect-[4/3] w-full object-cover" />
                 <figcaption className="p-3 text-sm font-semibold text-ink">{d.caption}</figcaption>
               </figure>
             ))}
