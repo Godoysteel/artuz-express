@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { QuoteForm } from "@/components/galpoes/QuoteForm";
+import { BarnConfiguratorLoader } from "@/components/galpoes/BarnConfiguratorLoader";
 import { GALPAO_MODELS } from "@/lib/galpoes";
 
 export const metadata: Metadata = {
@@ -147,10 +147,10 @@ export default function GalpoesPage() {
 
       <section id="orcamento" className="scroll-mt-32">
       <Container className="py-12">
-        <div className="mx-auto max-w-3xl">
-          <h2 className="text-2xl font-bold text-ink">Peça seu orçamento</h2>
-          <p className="mb-6 mt-2 text-slate-600">Preencha os dados abaixo. Leva poucos minutos.</p>
-          <QuoteForm />
+        <div>
+          <h2 className="text-2xl font-bold text-ink">Monte seu galpão e peça seu orçamento</h2>
+          <p className="mb-6 mt-2 text-slate-600">Escolha o modelo, a cor, o tamanho e as aberturas, veja em 3D e receba uma estimativa na hora.</p>
+          <BarnConfiguratorLoader />
         </div>
       </Container>
       </section>
