@@ -106,7 +106,7 @@ export default function BarnConfigurator() {
                 ))}
               </div>
             </div>
-            {!isOpen && <label className="flex items-center gap-2 text-sm font-medium text-ink"><input type="checkbox" checked={c.acm} onChange={(e) => set({ acm: e.target.checked })} /> Fachada frontal em ACM</label>}
+            {!isOpen && <label className="flex items-center gap-2 text-sm font-medium text-ink"><input type="checkbox" checked={c.acm} onChange={(e) => set({ acm: e.target.checked })} /> Revestimento em ACM em toda a construção</label>}
             {c.model === "celeiro" && <label className="flex items-center gap-2 text-sm font-medium text-ink"><input type="checkbox" checked={c.silo} onChange={(e) => set({ silo: e.target.checked })} /> Incluir silo decorativo</label>}
           </div>
         )}
