@@ -1,0 +1,11 @@
+# Não sobe no `vercel deploy --prod` (só o que o build precisa).
+# Pastas de trabalho/arte (centenas de MB) que o site não lê em runtime:
+/output
+/tmp
+/tmp-wind-reference.html
+/data/supplier
+/.claude
+# Padrões já ignorados pelo git:
+/node_modules
+/.next
+.env*.local
