@@ -90,7 +90,7 @@ export default function BarnConfigurator() {
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-3 gap-2">
               {GALPAO_MODELS.map((m) => (
-                <button key={m.id} type="button" aria-pressed={c.model === m.id} onClick={() => set({ model: m.id as BarnModel })}
+                <button key={m.id} type="button" aria-pressed={c.model === m.id} onClick={() => set(m.id === "celeiro" ? { model: "celeiro", gateType: "correr" } : { model: m.id as BarnModel })}
                   className={cn("flex flex-col gap-1 rounded-xl border-2 p-1.5 text-center text-xs font-semibold transition", c.model === m.id ? "border-accent bg-accent/10" : "border-slate-200 bg-slate-50 hover:border-slate-300")}>
                   <Image src={m.image} alt={m.name} width={300} height={225} className="w-full rounded-lg bg-[#f8f8f4]" />
                   {m.name}
@@ -106,7 +106,6 @@ export default function BarnConfigurator() {
                 ))}
               </div>
             </div>
-            {!isOpen && <label className="flex items-center gap-2 text-sm font-medium text-ink"><input type="checkbox" checked={c.acm} onChange={(e) => set({ acm: e.target.checked })} /> Revestimento em ACM em toda a construção</label>}
             {c.model === "celeiro" && <label className="flex items-center gap-2 text-sm font-medium text-ink"><input type="checkbox" checked={c.silo} onChange={(e) => set({ silo: e.target.checked })} /> Incluir silo decorativo</label>}
           </div>
         )}
